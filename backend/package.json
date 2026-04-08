@@ -1,0 +1,42 @@
+{
+  "name": "healthy-teeth-backend",
+  "version": "1.0.0",
+  "description": "Healthy Teeth Clinic - Backend API (NestJS)",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main.js",
+    "seed": "ts-node -r tsconfig-paths/register src/modules/seed/run-seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/common": "^11.1.18",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.1.18",
+    "@nestjs/mongoose": "^11.0.4",
+    "@nestjs/passport": "^11.0.5",
+    "@nestjs/platform-express": "^11.1.18",
+    "@nestjs/swagger": "^11.2.6",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.4",
+    "mongoose": "^9.4.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.18",
+    "@nestjs/schematics": "^11.0.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^6.0.2"
+  }
+}
