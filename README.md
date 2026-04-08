@@ -1,127 +1,212 @@
-# Healthy Teeth Clinic
+# 🦷 Healthy Teeth Clinic
 
-Aplicacion web para una clinica odontologica con:
+Aplicación web full-stack para la gestión de una clínica odontológica.
+Incluye sitio público, agendamiento de citas y panel administrativo con API REST.
 
-- Sitio publico (servicios, especialistas, disponibilidad, contacto)
-- Wizard de agendamiento de citas
-- Panel administrativo (login, dashboard, gestion de servicios/especialistas/citas)
-- API REST en NestJS + MongoDB
+---
 
-## Arquitectura actual
+## 🚀 Demo
 
-Este repositorio esta dividido en 2 apps:
+* 🌐 Frontend: *(pendiente despliegue)*
+* ⚙️ Backend API: *(pendiente despliegue)*
+* 📄 Documentación API (Swagger): `/api/docs`
 
-- `frontend/`: Next.js 16 (App Router)
-- `backend/`: NestJS 11 + Mongoose
+---
 
-El frontend consume la API del backend por HTTP (`NEXT_PUBLIC_API_URL`).
+## 🏗️ Arquitectura
 
-## Stack
+Este proyecto sigue una arquitectura **cliente-servidor desacoplada**:
 
-- Frontend: Next.js, React 19, TypeScript, Tailwind v4, shadcn/ui, Zod, React Hook Form
-- Backend: NestJS, TypeScript, Mongoose, class-validator
-- DB: MongoDB Atlas (o instancia Mongo compatible)
+* **Frontend:** SPA con SSR usando Next.js (App Router)
+* **Backend:** API REST con NestJS
+* **Base de datos:** MongoDB (Atlas)
 
-## Estructura
+```text
+Cliente (Next.js) ---> API REST (NestJS) ---> MongoDB
+```
+
+---
+
+## 🧩 Tecnologías
+
+### Frontend
+
+* Next.js 16
+* React 19
+* TypeScript
+* Tailwind CSS v4
+* shadcn/ui
+* React Hook Form + Zod
+
+### Backend
+
+* NestJS 11
+* TypeScript
+* Mongoose
+* class-validator
+
+### Infraestructura
+
+* MongoDB Atlas
+* Vercel (recomendado)
+* Render / Railway (backend)
+
+---
+
+## 📁 Estructura del proyecto
 
 ```text
 healthyTeethClinic/
-├── frontend/
-│   ├── src/app/                  # rutas publicas y admin
-│   ├── src/components/           # UI y componentes de negocio
-│   ├── src/lib/                  # helpers (api, validaciones, fechas)
+├── frontend/                # Aplicación web (Next.js)
+│   ├── src/app/
+│   ├── src/components/
+│   ├── src/lib/
 │   └── package.json
-├── backend/
-│   ├── src/modules/              # auth, services, specialists, appointments, etc.
-│   ├── src/common/               # guards, pipes, filtros, utils
+├── backend/                 # API REST (NestJS)
+│   ├── src/modules/
+│   ├── src/common/
 │   └── package.json
 └── README.md
 ```
 
-## Requisitos
+---
 
-- Node.js 20+ (recomendado)
-- npm 10+
-- MongoDB accesible desde tu equipo
+## ⚙️ Instalación
 
-## Instalacion
+### Requisitos
 
-Desde la raiz del proyecto:
+* Node.js 20+
+* npm 10+
+* MongoDB (local o Atlas)
+
+### Clonar repositorio
+
+```bash
+git clone https://github.com/davidhd709/healthyTeethClinic.git
+cd healthyTeethClinic
+```
+
+### Instalar dependencias
 
 ```bash
 cd frontend && npm install
 cd ../backend && npm install
 ```
 
-## Variables de entorno
+---
+
+## 🔐 Variables de entorno
 
 ### Backend (`backend/.env`)
 
-Crea `backend/.env` con este contenido base:
+Crea un archivo `.env` basado en `.env.example`:
 
 ```env
-MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/healthy-teeth-clinic?retryWrites=true&w=majority
+MONGODB_URI=<your_mongodb_connection_string>
 PORT=4000
 CORS_ORIGIN=http://localhost:3000
 
-ADMIN_EMAIL=admin@healthyteethclinic.com
-ADMIN_PASSWORD=admin123
+ADMIN_EMAIL=<your_admin_email>
+ADMIN_PASSWORD=<your_secure_password>
 
-# Firma de token admin (obligatorio en entornos reales)
-ADMIN_TOKEN_SECRET=change-this-secret-in-production
-# 8 horas
+ADMIN_TOKEN_SECRET=<your_secure_secret>
 ADMIN_TOKEN_TTL_SECONDS=28800
 ```
 
-Notas:
-
-- `JWT_SECRET` no es necesario para el flujo actual (se usa token firmado propio).
-- Asegura que tu IP tenga acceso en MongoDB Atlas.
+---
 
 ### Frontend (`frontend/.env.local`)
-
-Crea `frontend/.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
-# Botpress (opcional)
 NEXT_PUBLIC_BOTPRESS_CLIENT_ID=
 NEXT_PUBLIC_BOTPRESS_WEBCHAT_URL=https://cdn.botpress.cloud/webchat/v2.2/shareable.html
+
 BOTPRESS_API_URL=
 BOTPRESS_API_TOKEN=
 ```
 
-## Ejecucion en desarrollo
+---
 
-Abre 2 terminales:
+## ▶️ Ejecución en desarrollo
 
-### Terminal 1 - Backend
+### Backend
 
 ```bash
 cd backend
 npm run dev
 ```
 
-API: `http://localhost:4000`  
-Swagger: `http://localhost:4000/api/docs`
+* API: http://localhost:4000
+* Swagger: http://localhost:4000/api/docs
 
-### Terminal 2 - Frontend
+---
+
+### Frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Web: `http://localhost:3000`
+* Web: http://localhost:3000
 
-## Scripts utiles
+---
+
+## 📡 Endpoints principales
+
+### Públicos
+
+* `GET /api/services`
+* `GET /api/specialists`
+* `GET /api/availability`
+* `POST /api/appointments`
+* `POST /api/contact`
+
+### Autenticación
+
+* `POST /api/auth/login`
+
+### Administración (requiere token)
+
+* `POST|PUT|DELETE /api/services`
+* `POST|PUT|DELETE /api/specialists`
+* `GET|PUT|DELETE /api/appointments`
+* `GET /api/contact`
+
+---
+
+## 🧠 Funcionalidades
+
+* ✅ Gestión de servicios odontológicos
+* ✅ Gestión de especialistas
+* ✅ Agendamiento de citas (wizard paso a paso)
+* ✅ Validación de disponibilidad en tiempo real
+* ✅ Panel administrativo protegido
+* ✅ API documentada con Swagger
+
+---
+
+## 🔒 Seguridad
+
+* Uso de variables de entorno para credenciales sensibles
+* Autenticación basada en token para administración
+* Validación de datos en backend (class-validator)
+* Sanitización de inputs en frontend y backend
+
+> ⚠️ **Importante:**
+> Nunca subas archivos `.env` al repositorio.
+> Configura las variables de entorno directamente en tu proveedor de despliegue.
+
+---
+
+## 🧪 Scripts útiles
 
 ### Backend
 
 ```bash
-cd backend
 npm run dev
 npm run build
 npm run start
@@ -132,80 +217,69 @@ npm run seed
 ### Frontend
 
 ```bash
-cd frontend
 npm run dev
+npm run build
+npm run start
 npm run lint
-npm run build
-npm run start
 ```
 
-## Endpoints principales (backend)
+---
 
-Base URL: `http://localhost:4000`
+## 🚀 Despliegue
 
-- `POST /api/auth/login`
-- `GET /api/services`
-- `GET /api/specialists`
-- `GET /api/availability?specialistId=...&date=YYYY-MM-DD`
-- `POST /api/appointments`
-- `POST /api/contact`
+### Frontend (recomendado)
 
-Endpoints de administracion (requieren `Authorization: Bearer <admin_token>`):
+* Vercel
 
-- `POST|PUT|DELETE /api/services`
-- `POST|PUT|DELETE /api/specialists`
-- `GET|PUT|PATCH|DELETE /api/appointments`
-- `GET /api/contact`
-- `POST /api/seed`
+### Backend
 
-## Credenciales admin demo
+* Render
+* Railway
 
-- Email: `admin@healthyteethclinic.com`
-- Password: `admin123`
+### Base de datos
 
-## Flujo de agendamiento
+* MongoDB Atlas
 
-1. Servicio
-2. Especialista
-3. Fecha y hora
-4. Datos del paciente
-5. Confirmacion
+---
 
-El sistema valida:
+## 🛠️ Troubleshooting
 
-- campos requeridos
-- formato de fecha/hora
-- disponibilidad
-- conflicto de agenda (mismo especialista, fecha, hora)
+### Error de conexión a MongoDB
 
-## Troubleshooting rapido
+* Verificar `MONGODB_URI`
+* Permitir IP en MongoDB Atlas
+* Validar conexión de red
 
-### 1) Error `Cannot find module .../backend/dist/main`
+---
 
-Ejecuta:
+### Frontend no conecta con backend
 
-```bash
-cd backend
-rm -rf dist tsconfig.build.tsbuildinfo
-npm run build
-npm run start
+* Verificar:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
-### 2) `ECONNREFUSED` o error al conectar Mongo
+* Reiniciar servidor frontend
 
-- Revisa `MONGODB_URI`
-- Verifica whitelist de IP en Atlas
-- Verifica conectividad DNS/red
+---
 
-### 3) Frontend no consume backend
+## 📌 Estado del proyecto
 
-- Revisa `frontend/.env.local`:
-  - `NEXT_PUBLIC_API_URL=http://localhost:4000`
-- Reinicia `npm run dev` del frontend tras cambiar variables
+* ✅ Frontend compilando correctamente
+* ✅ Backend funcional
+* ✅ API documentada
+* 🚧 Pendiente despliegue en producción
 
-## Estado del proyecto
+---
 
-Validado localmente:
+## 👨‍💻 Autor
 
-- `frontend`: `npm run lint` y `npm run build` OK
-- `backend`: `npm run build` OK
+Desarrollado por **Henry David**
+Estudiante de Ingeniería de Sistemas
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de uso académico y demostrativo.
