@@ -1,266 +1,211 @@
 # Healthy Teeth Clinic
 
-Plataforma web profesional para una clínica odontológica premium. Permite mostrar servicios, especialistas, agendar citas online, consultar disponibilidad y gestionar la clínica desde un panel administrativo.
+Aplicacion web para una clinica odontologica con:
 
-## Stack Tecnológico
+- Sitio publico (servicios, especialistas, disponibilidad, contacto)
+- Wizard de agendamiento de citas
+- Panel administrativo (login, dashboard, gestion de servicios/especialistas/citas)
+- API REST en NestJS + MongoDB
 
-| Tecnología | Uso |
-|---|---|
-| **Next.js 16** (App Router) | Framework full-stack |
-| **TypeScript** | Tipado estático |
-| **Tailwind CSS v4** | Estilos |
-| **shadcn/ui** | Componentes UI |
-| **MongoDB Atlas** | Base de datos |
-| **Mongoose** | ODM para MongoDB |
-| **React Hook Form + Zod** | Formularios y validación |
-| **date-fns** | Manejo de fechas |
-| **lucide-react** | Iconografía |
-| **Sonner** | Notificaciones toast |
+## Arquitectura actual
 
-## Estructura del Proyecto
+Este repositorio esta dividido en 2 apps:
 
-```
-src/
-├── app/
-│   ├── page.tsx                    # Landing / Home
-│   ├── layout.tsx                  # Layout raíz
-│   ├── servicios/                  # Servicios (listado + detalle)
-│   ├── especialistas/              # Especialistas (listado + perfil)
-│   ├── agendar/                    # Agendamiento de citas
-│   ├── disponibilidad/             # Disponibilidad de horarios
-│   ├── contacto/                   # Página de contacto
-│   ├── admin/                      # Panel administrativo
-│   │   ├── login/                  # Login admin
-│   │   ├── dashboard/              # Dashboard
-│   │   ├── servicios/              # CRUD servicios
-│   │   ├── especialistas/          # CRUD especialistas
-│   │   └── citas/                  # Gestión de citas
-│   └── api/                        # API Routes
-│       ├── services/               # CRUD servicios
-│       ├── specialists/            # CRUD especialistas
-│       ├── appointments/           # CRUD citas
-│       ├── availability/           # Consulta de disponibilidad
-│       ├── auth/                   # Autenticación admin
-│       ├── contact/                # Mensajes de contacto
-│       ├── seed/                   # Seed de datos demo
-│       └── botpress/webhook/       # Webhook Botpress
-├── components/
-│   ├── ui/                         # Componentes shadcn/ui
-│   ├── layout/                     # Navbar, Footer
-│   ├── shared/                     # Componentes reutilizables
-│   ├── booking/                    # Wizard de agendamiento
-│   ├── availability/               # Explorador de disponibilidad
-│   ├── contact/                    # Formulario de contacto
-│   ├── admin/                      # Sidebar admin
-│   └── botpress/                   # Integración Botpress
-├── models/                         # Modelos Mongoose
-├── lib/                            # Utilidades, conexión DB, validaciones
-├── types/                          # Tipos TypeScript
-└── hooks/                          # Custom hooks
+- `frontend/`: Next.js 16 (App Router)
+- `backend/`: NestJS 11 + Mongoose
+
+El frontend consume la API del backend por HTTP (`NEXT_PUBLIC_API_URL`).
+
+## Stack
+
+- Frontend: Next.js, React 19, TypeScript, Tailwind v4, shadcn/ui, Zod, React Hook Form
+- Backend: NestJS, TypeScript, Mongoose, class-validator
+- DB: MongoDB Atlas (o instancia Mongo compatible)
+
+## Estructura
+
+```text
+healthyTeethClinic/
+├── frontend/
+│   ├── src/app/                  # rutas publicas y admin
+│   ├── src/components/           # UI y componentes de negocio
+│   ├── src/lib/                  # helpers (api, validaciones, fechas)
+│   └── package.json
+├── backend/
+│   ├── src/modules/              # auth, services, specialists, appointments, etc.
+│   ├── src/common/               # guards, pipes, filtros, utils
+│   └── package.json
+└── README.md
 ```
 
-## Instalación y Configuración
+## Requisitos
 
-### 1. Clonar e instalar dependencias
+- Node.js 20+ (recomendado)
+- npm 10+
+- MongoDB accesible desde tu equipo
+
+## Instalacion
+
+Desde la raiz del proyecto:
 
 ```bash
-git clone <repo-url>
-cd healthyTeethClinic
-npm install
+cd frontend && npm install
+cd ../backend && npm install
 ```
 
-### 2. Configurar MongoDB Atlas
+## Variables de entorno
 
-1. Crear una cuenta en [MongoDB Atlas](https://www.mongodb.com/atlas)
-2. Crear un cluster gratuito (M0)
-3. Crear un usuario de base de datos
-4. Agregar tu IP a la lista de acceso (o `0.0.0.0/0` para desarrollo)
-5. Obtener la cadena de conexión (connection string)
+### Backend (`backend/.env`)
 
-### 3. Variables de entorno
-
-Copiar el archivo de ejemplo y configurar:
-
-```bash
-cp .env.example .env.local
-```
-
-Editar `.env.local` con tus credenciales:
+Crea `backend/.env` con este contenido base:
 
 ```env
-# MongoDB Atlas - Reemplazar con tu connection string real
-MONGODB_URI=mongodb+srv://TU_USUARIO:TU_PASSWORD@tu-cluster.mongodb.net/healthy-teeth-clinic?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/healthy-teeth-clinic?retryWrites=true&w=majority
+PORT=4000
+CORS_ORIGIN=http://localhost:3000
 
-# URL del sitio
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# Credenciales admin (demo)
 ADMIN_EMAIL=admin@healthyteethclinic.com
 ADMIN_PASSWORD=admin123
 
-# Botpress (opcional - ver sección Botpress)
-BOTPRESS_BOT_ID=
+# Firma de token admin (obligatorio en entornos reales)
+ADMIN_TOKEN_SECRET=change-this-secret-in-production
+# 8 horas
+ADMIN_TOKEN_TTL_SECONDS=28800
+```
+
+Notas:
+
+- `JWT_SECRET` no es necesario para el flujo actual (se usa token firmado propio).
+- Asegura que tu IP tenga acceso en MongoDB Atlas.
+
+### Frontend (`frontend/.env.local`)
+
+Crea `frontend/.env.local`:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Botpress (opcional)
 NEXT_PUBLIC_BOTPRESS_CLIENT_ID=
 NEXT_PUBLIC_BOTPRESS_WEBCHAT_URL=https://cdn.botpress.cloud/webchat/v2.2/shareable.html
 BOTPRESS_API_URL=
 BOTPRESS_API_TOKEN=
 ```
 
-### 4. Iniciar servidor de desarrollo
+## Ejecucion en desarrollo
+
+Abre 2 terminales:
+
+### Terminal 1 - Backend
 
 ```bash
+cd backend
 npm run dev
 ```
 
-Abrir [http://localhost:3000](http://localhost:3000)
+API: `http://localhost:4000`  
+Swagger: `http://localhost:4000/api/docs`
 
-### 5. Cargar datos de demostración
-
-Una vez la app esté corriendo, cargar los datos seed:
-
-```bash
-curl -X POST http://localhost:3000/api/seed
-```
-
-O desde el panel admin: ir a `/admin/login`, ingresar con las credenciales demo, y en el Dashboard hacer clic en "Seed Database".
-
-## Páginas y Funcionalidades
-
-### Sitio Público
-
-| Página | Ruta | Descripción |
-|---|---|---|
-| Home | `/` | Landing con hero, servicios, especialistas, testimonios, FAQ |
-| Servicios | `/servicios` | Catálogo de servicios odontológicos |
-| Detalle Servicio | `/servicios/[slug]` | Detalle completo del servicio |
-| Especialistas | `/especialistas` | Equipo de odontólogos |
-| Perfil Especialista | `/especialistas/[slug]` | Perfil completo con horarios |
-| Agendar Cita | `/agendar` | Wizard de 5 pasos para reservar cita |
-| Disponibilidad | `/disponibilidad` | Explorador interactivo de horarios |
-| Contacto | `/contacto` | Formulario e información de contacto |
-
-### Panel Administrativo
-
-| Página | Ruta | Descripción |
-|---|---|---|
-| Login | `/admin/login` | Autenticación admin |
-| Dashboard | `/admin/dashboard` | Estadísticas y acciones rápidas |
-| Servicios | `/admin/servicios` | CRUD completo de servicios |
-| Especialistas | `/admin/especialistas` | CRUD completo de especialistas |
-| Citas | `/admin/citas` | Gestión y filtrado de citas |
-
-### Credenciales Admin (Demo)
-
-- **Email:** `admin@healthyteethclinic.com`
-- **Password:** `admin123`
-
-## Flujo de Agendamiento
-
-El corazón de la aplicación es el wizard de agendamiento en 5 pasos:
-
-1. **Seleccionar Servicio** - Elegir entre los servicios disponibles
-2. **Seleccionar Especialista** - Ver especialistas que ofrecen el servicio
-3. **Seleccionar Fecha y Hora** - Calendario con disponibilidad real
-4. **Datos del Paciente** - Formulario validado con datos personales
-5. **Confirmar Cita** - Resumen y confirmación
-
-El sistema previene doble reserva en el mismo horario con el mismo especialista.
-
-## API Endpoints
-
-| Método | Endpoint | Descripción |
-|---|---|---|
-| GET | `/api/services` | Listar servicios activos |
-| POST | `/api/services` | Crear servicio |
-| GET/PUT/DELETE | `/api/services/[id]` | Operaciones sobre servicio |
-| GET | `/api/specialists` | Listar especialistas activos |
-| POST | `/api/specialists` | Crear especialista |
-| GET/PUT/DELETE | `/api/specialists/[id]` | Operaciones sobre especialista |
-| GET | `/api/appointments` | Listar citas (soporta filtros) |
-| POST | `/api/appointments` | Crear cita |
-| GET/PUT/DELETE | `/api/appointments/[id]` | Operaciones sobre cita |
-| GET | `/api/availability?specialistId=...&date=...` | Consultar disponibilidad |
-| POST | `/api/auth` | Login admin |
-| POST | `/api/contact` | Enviar mensaje de contacto |
-| POST | `/api/seed` | Cargar datos demo |
-| POST | `/api/botpress/webhook` | Webhook para Botpress |
-
-## Integración con Botpress
-
-La aplicación está preparada para integrarse con [Botpress](https://botpress.com/) para atención conversacional.
-
-### Activar Botpress Webchat
-
-1. Crear un bot en [Botpress Cloud](https://app.botpress.cloud/)
-2. Obtener el **Client ID** del bot
-3. Configurar las variables en `.env.local`:
-
-```env
-NEXT_PUBLIC_BOTPRESS_CLIENT_ID=tu-client-id-de-botpress
-NEXT_PUBLIC_BOTPRESS_WEBCHAT_URL=https://cdn.botpress.cloud/webchat/v2.2/shareable.html
-```
-
-4. Reiniciar el servidor. El botón de chat flotante aparecerá automáticamente.
-
-### Integración futura con API de Botpress
-
-Los siguientes archivos están preparados para conectar funcionalidades avanzadas:
-
-- **`src/lib/botpress.ts`** - Funciones utilitarias para comunicación con Botpress API
-- **`src/app/api/botpress/webhook/route.ts`** - Webhook para recibir eventos del bot
-- **`src/components/botpress/BotpressProvider.tsx`** - Proveedor de contexto para enviar datos al bot
-
-#### Capacidades preparadas:
-
-1. **FAQ automatizadas** - El bot puede responder preguntas frecuentes sobre procedimientos
-2. **Orientación de servicios** - Guiar al paciente hacia el servicio adecuado
-3. **Inicio de agendamiento** - Redirigir al formulario de citas con contexto pre-cargado
-4. **Contexto de página** - Enviar al bot información del servicio/especialista que el usuario está viendo
-
-### Configurar Webhook en Botpress
-
-1. En tu bot de Botpress, ir a Integrations > Webhooks
-2. Configurar la URL: `https://tu-dominio.com/api/botpress/webhook`
-3. Configurar los eventos que deseas escuchar
-
-Para más detalles, ver comentarios en `src/app/api/botpress/webhook/route.ts`.
-
-## Despliegue
-
-### Vercel (Recomendado)
-
-1. Conectar repositorio en [Vercel](https://vercel.com)
-2. Configurar variables de entorno en el dashboard de Vercel
-3. Deploy automático
-
-### Variables de entorno en producción
-
-Asegurarse de configurar TODAS las variables de `.env.example` en el proveedor de hosting.
-
-## Datos de Demo
-
-Los datos seed incluyen:
-
-- **10 servicios** odontológicos con descripciones, duración y precios
-- **8 especialistas** con diferentes especialidades, biografías y horarios semanales
-- **6 testimonios** realistas de pacientes
-
-## Comandos
+### Terminal 2 - Frontend
 
 ```bash
-npm run dev      # Servidor de desarrollo
-npm run build    # Build de producción
-npm run start    # Iniciar servidor de producción
-npm run lint     # Ejecutar linter
+cd frontend
+npm run dev
 ```
 
-## Tecnologías y Decisiones de Arquitectura
+Web: `http://localhost:3000`
 
-- **App Router** de Next.js para routing basado en archivos y Server Components
-- **Server Components** para páginas que consultan la base de datos (SEO, performance)
-- **Client Components** para interactividad (wizard de booking, filtros, admin)
-- **Mongoose** como ODM para modelos estructurados con validación de esquema
-- **Zod** para validación de formularios en cliente y servidor
-- **shadcn/ui** para componentes UI consistentes y accesibles
-- **Diseño responsive** mobile-first con Tailwind CSS
-- **Paleta premium** de azul clínico y turquesa para transmitir confianza y salud
+## Scripts utiles
+
+### Backend
+
+```bash
+cd backend
+npm run dev
+npm run build
+npm run start
+npm run start:prod
+npm run seed
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm run dev
+npm run lint
+npm run build
+npm run start
+```
+
+## Endpoints principales (backend)
+
+Base URL: `http://localhost:4000`
+
+- `POST /api/auth/login`
+- `GET /api/services`
+- `GET /api/specialists`
+- `GET /api/availability?specialistId=...&date=YYYY-MM-DD`
+- `POST /api/appointments`
+- `POST /api/contact`
+
+Endpoints de administracion (requieren `Authorization: Bearer <admin_token>`):
+
+- `POST|PUT|DELETE /api/services`
+- `POST|PUT|DELETE /api/specialists`
+- `GET|PUT|PATCH|DELETE /api/appointments`
+- `GET /api/contact`
+- `POST /api/seed`
+
+## Credenciales admin demo
+
+- Email: `admin@healthyteethclinic.com`
+- Password: `admin123`
+
+## Flujo de agendamiento
+
+1. Servicio
+2. Especialista
+3. Fecha y hora
+4. Datos del paciente
+5. Confirmacion
+
+El sistema valida:
+
+- campos requeridos
+- formato de fecha/hora
+- disponibilidad
+- conflicto de agenda (mismo especialista, fecha, hora)
+
+## Troubleshooting rapido
+
+### 1) Error `Cannot find module .../backend/dist/main`
+
+Ejecuta:
+
+```bash
+cd backend
+rm -rf dist tsconfig.build.tsbuildinfo
+npm run build
+npm run start
+```
+
+### 2) `ECONNREFUSED` o error al conectar Mongo
+
+- Revisa `MONGODB_URI`
+- Verifica whitelist de IP en Atlas
+- Verifica conectividad DNS/red
+
+### 3) Frontend no consume backend
+
+- Revisa `frontend/.env.local`:
+  - `NEXT_PUBLIC_API_URL=http://localhost:4000`
+- Reinicia `npm run dev` del frontend tras cambiar variables
+
+## Estado del proyecto
+
+Validado localmente:
+
+- `frontend`: `npm run lint` y `npm run build` OK
+- `backend`: `npm run build` OK
