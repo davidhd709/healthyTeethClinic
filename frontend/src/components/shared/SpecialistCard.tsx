@@ -38,9 +38,12 @@ export default function SpecialistCard({ specialist }: SpecialistCardProps) {
         <div className="flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-2xl font-bold text-white shadow-md ring-4 ring-primary/10 transition-shadow duration-300 group-hover:ring-primary/20">
           {initials}
         </div>
-        <h3 className="mt-3 text-center text-lg font-semibold text-foreground">
+        <Link
+          href={`/especialistas/${specialist.slug}`}
+          className="mt-3 text-center text-lg font-semibold text-foreground transition-colors hover:text-primary"
+        >
           {specialist.name}
-        </h3>
+        </Link>
         <Badge variant="secondary" className="mt-1">
           {specialist.specialty}
         </Badge>

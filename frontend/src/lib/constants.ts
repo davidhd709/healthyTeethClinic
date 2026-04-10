@@ -32,6 +32,5 @@ export const NAV_LINKS = [
   { href: '/', label: 'Inicio' },
   { href: '/servicios', label: 'Servicios' },
   { href: '/especialistas', label: 'Especialistas' },
-  { href: '/disponibilidad', label: 'Disponibilidad' },
   { href: '/contacto', label: 'Contacto' },
 ];

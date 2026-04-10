@@ -1081,6 +1081,8 @@ export default function BookingWizard() {
       }
       if (preselectedService && preselectedSpecialist) return Math.max(prev, 3);
       if (preselectedService) return Math.max(prev, 2);
+      // Specialist-first flow: stay on step 1 to pick a service (filtered)
+      if (preselectedSpecialist && !preselectedService) return 1;
       return prev;
     });
   }, [
@@ -1094,6 +1096,17 @@ export default function BookingWizard() {
     selectedDate,
     selectedTime,
   ]);
+
+  // ---- Filtered services for selected specialist (specialist-first flow) ----
+  const filteredServices = useMemo(() => {
+    if (!selectedSpecialist) return services;
+    return services.filter((svc) =>
+      selectedSpecialist.services.some((s: string | IService) => {
+        const id = typeof s === 'string' ? s : (s as IService)._id;
+        return id === svc._id;
+      })
+    );
+  }, [selectedSpecialist, services]);
 
   // ---- Filtered specialists for selected service ----
   const filteredSpecialists = useMemo(() => {
@@ -1196,11 +1209,22 @@ export default function BookingWizard() {
   // ---- Service selection handler ----
   const handleServiceSelect = useCallback((service: IService) => {
     setSelectedService(service);
-    // Reset downstream selections when service changes
-    setSelectedSpecialist(null);
+    // If specialist already selected (specialist-first flow) and still valid, keep it
+    if (selectedSpecialist) {
+      const specialistHasService = selectedSpecialist.services.some(
+        (svc: string | IService) => {
+          const id = typeof svc === 'string' ? svc : (svc as IService)._id;
+          return id === service._id;
+        }
+      );
+      if (!specialistHasService) {
+        setSelectedSpecialist(null);
+      }
+    }
+    // Always reset date/time when service changes
     setSelectedDate(undefined);
     setSelectedTime(null);
-  }, []);
+  }, [selectedSpecialist]);
 
   // ---- Specialist selection handler ----
   const handleSpecialistSelect = useCallback(
@@ -1342,12 +1366,32 @@ export default function BookingWizard() {
       {/* Step Content */}
       <div className="min-h-[320px]">
         {currentStep === 1 && (
-          <ServiceStep
-            services={services}
-            loading={loadingServices}
-            selectedId={selectedService?._id ?? null}
-            onSelect={handleServiceSelect}
-          />
+          <>
+            {selectedSpecialist && (
+              <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-primary">
+                <span className="font-medium">Especialista seleccionado:</span>{' '}
+                {selectedSpecialist.name} &mdash; mostrando solo sus servicios disponibles.
+                <button
+                  type="button"
+                  className="ml-2 underline hover:no-underline"
+                  onClick={() => {
+                    setSelectedSpecialist(null);
+                    setSelectedService(null);
+                    setSelectedDate(undefined);
+                    setSelectedTime(null);
+                  }}
+                >
+                  Ver todos
+                </button>
+              </div>
+            )}
+            <ServiceStep
+              services={filteredServices}
+              loading={loadingServices}
+              selectedId={selectedService?._id ?? null}
+              onSelect={handleServiceSelect}
+            />
+          </>
         )}
 
         {currentStep === 2 && (

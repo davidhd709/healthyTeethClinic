@@ -296,13 +296,9 @@ export default async function EspecialistaDetailPage({ params }: PageProps) {
 
                   <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {services.map((service) => (
-                      <Link
-                        key={service._id}
-                        href={`/servicios/${service.slug}`}
-                        className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-xl"
-                      >
+                      <div key={service._id}>
                         <ServiceCard service={service} />
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 </div>
