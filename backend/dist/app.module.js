@@ -17,6 +17,7 @@ const appointments_module_1 = require("./modules/appointments/appointments.modul
 const availability_module_1 = require("./modules/availability/availability.module");
 const contact_module_1 = require("./modules/contact/contact.module");
 const seed_module_1 = require("./modules/seed/seed.module");
+const bot_module_1 = require("./modules/bot/bot.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
             availability_module_1.AvailabilityModule,
             contact_module_1.ContactModule,
             seed_module_1.SeedModule,
+            bot_module_1.BotModule,
         ],
     })
 ], AppModule);

@@ -34,21 +34,13 @@ export declare class AppointmentsController {
     } & Required<{
         _id: import("mongoose").Types.ObjectId;
     }>>;
-    create(dto: CreateAppointmentDto): Promise<import("mongoose").Document<unknown, {}, import("mongoose").Document<unknown, {}, import("./schemas/appointment.schema").Appointment, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/appointment.schema").Appointment & {
+    create(dto: CreateAppointmentDto): Promise<import("mongoose").Document<unknown, {}, import("./schemas/appointment.schema").Appointment, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/appointment.schema").Appointment & {
         _id: import("mongoose").Types.ObjectId;
     } & {
         __v: number;
     } & {
         id: string;
-    }, {}, import("mongoose").DefaultSchemaOptions> & import("mongoose").Document<unknown, {}, import("./schemas/appointment.schema").Appointment, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/appointment.schema").Appointment & {
-        _id: import("mongoose").Types.ObjectId;
-    } & {
-        __v: number;
-    } & {
-        id: string;
-    } & Required<{
-        _id: import("mongoose").Types.ObjectId;
-    }>>;
+    }>;
     update(id: string, dto: UpdateAppointmentDto): Promise<import("mongoose").Document<unknown, {}, import("mongoose").Document<unknown, {}, import("./schemas/appointment.schema").Appointment, {}, import("mongoose").DefaultSchemaOptions> & import("./schemas/appointment.schema").Appointment & {
         _id: import("mongoose").Types.ObjectId;
     } & {

@@ -8,6 +8,7 @@ import { AppointmentsModule } from './modules/appointments/appointments.module';
 import { AvailabilityModule } from './modules/availability/availability.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { SeedModule } from './modules/seed/seed.module';
+import { BotModule } from './modules/bot/bot.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SeedModule } from './modules/seed/seed.module';
     AvailabilityModule,
     ContactModule,
     SeedModule,
+    BotModule,
   ],
 })
 export class AppModule {}

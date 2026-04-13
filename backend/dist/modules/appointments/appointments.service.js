@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var AppointmentsService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppointmentsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,9 +19,16 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const appointment_schema_1 = require("./schemas/appointment.schema");
 const date_util_1 = require("../../common/utils/date.util");
-let AppointmentsService = class AppointmentsService {
-    constructor(appointmentModel) {
+const email_service_1 = require("../integrations/email.service");
+const google_calendar_service_1 = require("../integrations/google-calendar.service");
+const google_sheets_service_1 = require("../integrations/google-sheets.service");
+let AppointmentsService = AppointmentsService_1 = class AppointmentsService {
+    constructor(appointmentModel, emailService, calendarService, sheetsService) {
         this.appointmentModel = appointmentModel;
+        this.emailService = emailService;
+        this.calendarService = calendarService;
+        this.sheetsService = sheetsService;
+        this.logger = new common_1.Logger(AppointmentsService_1.name);
     }
     async findAll(filters = {}) {
         const query = {};
@@ -91,8 +99,9 @@ let AppointmentsService = class AppointmentsService {
             time: dto.time,
             status: 'cancelada',
         });
+        let created;
         try {
-            return await this.appointmentModel.create({
+            created = await this.appointmentModel.create({
                 ...dto,
                 date: appointmentDate,
             });
@@ -106,6 +115,61 @@ let AppointmentsService = class AppointmentsService {
             }
             throw error;
         }
+        void this.triggerIntegrations(created._id).catch((err) => {
+            this.logger.error('Integration trigger failed', err);
+        });
+        return created;
+    }
+    async triggerIntegrations(appointmentId) {
+        const populated = await this.appointmentModel
+            .findById(appointmentId)
+            .populate('serviceId', 'name durationMinutes')
+            .populate('specialistId', 'name')
+            .exec();
+        if (!populated) {
+            this.logger.warn(`Could not populate appointment ${appointmentId} for integrations`);
+            return;
+        }
+        const service = populated.serviceId;
+        const specialist = populated.specialistId;
+        const dateIso = populated.date.toISOString().split('T')[0];
+        const createdAtIso = populated.createdAt?.toISOString() ?? new Date().toISOString();
+        await Promise.all([
+            this.emailService.sendAppointmentConfirmation({
+                patientName: populated.patientName,
+                patientEmail: populated.patientEmail,
+                serviceName: service.name,
+                specialistName: specialist.name,
+                date: dateIso,
+                time: populated.time,
+                clinicAddress: 'Calle 93 #12-45, Consultorio 301, Bogotá, Colombia',
+                clinicPhone: '+57 601 555 0123',
+            }),
+            this.calendarService.createAppointmentEvent({
+                patientName: populated.patientName,
+                patientEmail: populated.patientEmail,
+                patientPhone: populated.patientPhone,
+                serviceName: service.name,
+                serviceDurationMinutes: service.durationMinutes,
+                specialistName: specialist.name,
+                date: dateIso,
+                time: populated.time,
+                reasonForVisit: populated.reasonForVisit,
+            }),
+            this.sheetsService.appendAppointment({
+                createdAt: createdAtIso,
+                patientName: populated.patientName,
+                patientEmail: populated.patientEmail,
+                patientPhone: populated.patientPhone,
+                patientDocument: populated.patientDocument,
+                serviceName: service.name,
+                specialistName: specialist.name,
+                date: dateIso,
+                time: populated.time,
+                status: populated.status,
+                reasonForVisit: populated.reasonForVisit,
+            }),
+        ]);
     }
     async update(id, dto) {
         const updateData = { ...dto };
@@ -135,9 +199,12 @@ let AppointmentsService = class AppointmentsService {
     }
 };
 exports.AppointmentsService = AppointmentsService;
-exports.AppointmentsService = AppointmentsService = __decorate([
+exports.AppointmentsService = AppointmentsService = AppointmentsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(appointment_schema_1.Appointment.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        email_service_1.EmailService,
+        google_calendar_service_1.GoogleCalendarService,
+        google_sheets_service_1.GoogleSheetsService])
 ], AppointmentsService);
 //# sourceMappingURL=appointments.service.js.map

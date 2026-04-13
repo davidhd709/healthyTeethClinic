@@ -26,6 +26,7 @@ exports.AvailabilityModule = AvailabilityModule = __decorate([
         ],
         controllers: [availability_controller_1.AvailabilityController],
         providers: [availability_service_1.AvailabilityService],
+        exports: [availability_service_1.AvailabilityService],
     })
 ], AvailabilityModule);
 //# sourceMappingURL=availability.module.js.map
