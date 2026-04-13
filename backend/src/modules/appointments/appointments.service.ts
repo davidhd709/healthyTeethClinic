@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -10,6 +11,9 @@ import { Appointment, AppointmentDocument } from './schemas/appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { endOfDay, parseDateOnly } from '../../common/utils/date.util';
+import { EmailService } from '../integrations/email.service';
+import { GoogleCalendarService } from '../integrations/google-calendar.service';
+import { GoogleSheetsService } from '../integrations/google-sheets.service';
 
 export interface AppointmentFilters {
   status?: string;
@@ -21,9 +25,14 @@ export interface AppointmentFilters {
 
 @Injectable()
 export class AppointmentsService {
+  private readonly logger = new Logger(AppointmentsService.name);
+
   constructor(
     @InjectModel(Appointment.name)
     private readonly appointmentModel: Model<AppointmentDocument>,
+    private readonly emailService: EmailService,
+    private readonly calendarService: GoogleCalendarService,
+    private readonly sheetsService: GoogleSheetsService,
   ) {}
 
   async findAll(filters: AppointmentFilters = {}) {
@@ -111,8 +120,9 @@ export class AppointmentsService {
       status: 'cancelada',
     });
 
+    let created: AppointmentDocument;
     try {
-      return await this.appointmentModel.create({
+      created = await this.appointmentModel.create({
         ...dto,
         date: appointmentDate,
       });
@@ -129,6 +139,73 @@ export class AppointmentsService {
       }
       throw error;
     }
+
+    // Fire-and-forget integrations (do not block the response)
+    void this.triggerIntegrations(created._id as unknown as string).catch((err) => {
+      this.logger.error('Integration trigger failed', err);
+    });
+
+    return created;
+  }
+
+  private async triggerIntegrations(appointmentId: string): Promise<void> {
+    const populated = await this.appointmentModel
+      .findById(appointmentId)
+      .populate<{ serviceId: { name: string; durationMinutes: number } }>(
+        'serviceId',
+        'name durationMinutes',
+      )
+      .populate<{ specialistId: { name: string } }>('specialistId', 'name')
+      .exec();
+
+    if (!populated) {
+      this.logger.warn(`Could not populate appointment ${appointmentId} for integrations`);
+      return;
+    }
+
+    const service = populated.serviceId as unknown as { name: string; durationMinutes: number };
+    const specialist = populated.specialistId as unknown as { name: string };
+
+    const dateIso = populated.date.toISOString().split('T')[0];
+    const createdAtIso = (populated as unknown as { createdAt?: Date }).createdAt?.toISOString() ?? new Date().toISOString();
+
+    // Run in parallel, all errors are swallowed by the individual services (they just log)
+    await Promise.all([
+      this.emailService.sendAppointmentConfirmation({
+        patientName: populated.patientName,
+        patientEmail: populated.patientEmail,
+        serviceName: service.name,
+        specialistName: specialist.name,
+        date: dateIso,
+        time: populated.time,
+        clinicAddress: 'Calle 93 #12-45, Consultorio 301, Bogotá, Colombia',
+        clinicPhone: '+57 601 555 0123',
+      }),
+      this.calendarService.createAppointmentEvent({
+        patientName: populated.patientName,
+        patientEmail: populated.patientEmail,
+        patientPhone: populated.patientPhone,
+        serviceName: service.name,
+        serviceDurationMinutes: service.durationMinutes,
+        specialistName: specialist.name,
+        date: dateIso,
+        time: populated.time,
+        reasonForVisit: populated.reasonForVisit,
+      }),
+      this.sheetsService.appendAppointment({
+        createdAt: createdAtIso,
+        patientName: populated.patientName,
+        patientEmail: populated.patientEmail,
+        patientPhone: populated.patientPhone,
+        patientDocument: populated.patientDocument,
+        serviceName: service.name,
+        specialistName: specialist.name,
+        date: dateIso,
+        time: populated.time,
+        status: populated.status,
+        reasonForVisit: populated.reasonForVisit,
+      }),
+    ]);
   }
 
   async update(id: string, dto: UpdateAppointmentDto) {
