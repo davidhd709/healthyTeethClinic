@@ -1,7 +1,12 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { BotService } from './bot.service';
+import { BotBookingState, BotService } from './bot.service';
 import { CreateAppointmentDto } from '../appointments/dto/create-appointment.dto';
+
+interface BookingTurnDto {
+  message?: string;
+  state?: Partial<BotBookingState>;
+}
 
 @ApiTags('Bot')
 @Controller('api/bot')
@@ -42,5 +47,10 @@ export class BotController {
   @Post('appointments')
   async createAppointment(@Body() dto: CreateAppointmentDto) {
     return this.botService.createAppointment(dto);
+  }
+
+  @Post('booking/turn')
+  async bookingTurn(@Body() body: BookingTurnDto) {
+    return this.botService.processBookingTurn(body?.message ?? '', body?.state);
   }
 }

@@ -43,6 +43,9 @@ let BotController = class BotController {
     async createAppointment(dto) {
         return this.botService.createAppointment(dto);
     }
+    async bookingTurn(body) {
+        return this.botService.processBookingTurn(body?.message ?? '', body?.state);
+    }
 };
 exports.BotController = BotController;
 __decorate([
@@ -75,6 +78,13 @@ __decorate([
     __metadata("design:paramtypes", [create_appointment_dto_1.CreateAppointmentDto]),
     __metadata("design:returntype", Promise)
 ], BotController.prototype, "createAppointment", null);
+__decorate([
+    (0, common_1.Post)('booking/turn'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BotController.prototype, "bookingTurn", null);
 exports.BotController = BotController = __decorate([
     (0, swagger_1.ApiTags)('Bot'),
     (0, common_1.Controller)('api/bot'),

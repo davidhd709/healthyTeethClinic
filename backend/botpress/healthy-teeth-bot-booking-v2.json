@@ -1,0 +1,988 @@
+{
+  "version": "1.19",
+  "settings": {
+    "defaultLanguage": "en",
+    "languages": [
+      "en"
+    ],
+    "description": "",
+    "id": "bbc1d869-7dde-4446-aeba-0e2f692273cf",
+    "inactivityTimeout": 30,
+    "botVariables": [],
+    "userVariables": [],
+    "nodeRepetitionLimit": 3,
+    "configVariables": {},
+    "cognitiveConfigs": {
+      "openAi": {}
+    },
+    "useLlmz": true,
+    "defaultBestModel": "openai__gpt-4.1-nano-2025-04-14",
+    "defaultFastModel": "openai__gpt-4.1-nano-2025-04-14",
+    "useClient": true,
+    "llmzVersion": "01-Oct-2024",
+    "autonomousModel": "best-model",
+    "fallbackModel": "openai__gpt-5.4-nano-2026-03-17",
+    "usePushToGit": false,
+    "useCognitiveV2": true,
+    "disablePublishButton": false,
+    "typingIndicatorDisabledByDefault": false
+  },
+  "flows": [
+    {
+      "id": "wf-error",
+      "name": "Error",
+      "startNode": "nd-98dc0bcc87",
+      "variables": [],
+      "links": [
+        {
+          "id": "edg-1cb5862648",
+          "source": "nd-98dc0bcc87",
+          "sourcePort": "trs-02c7129430",
+          "target": "nd-58fca56e01"
+        },
+        {
+          "id": "edg-1c28c96d6a",
+          "source": "nd-58fca56e01",
+          "sourcePort": "nd-58fca56e01",
+          "target": "nd-e05f59dd66"
+        }
+      ],
+      "nodes": [
+        {
+          "comment": "<p><span style=\"font-size: 18px\"><strong>⛔️ When something goes wrong</strong></span></p><p><br>This workflow is executed when there's an <strong>unexpected error</strong> in one of the other workflows.</p><p></p><p>You can use this to inform the user of the situation before ending the conversation.</p>",
+          "type": "comment",
+          "id": "nd-8ff3d7d295",
+          "name": "Comment1",
+          "deletable": true,
+          "instructions": [],
+          "height": 148,
+          "width": 401,
+          "x": 90,
+          "y": -45
+        },
+        {
+          "instructions": [
+            {
+              "id": "ins-2762f70004",
+              "type": "content",
+              "content": {
+                "type": "text",
+                "text": {
+                  "staticValue": "Sorry, an error occurred. Please try again later",
+                  "dynamicValue": "",
+                  "valueType": "static"
+                },
+                "typing": {
+                  "valueType": "static",
+                  "staticValue": true
+                }
+              },
+              "nodeId": "nd-58fca56e01",
+              "transitions": []
+            }
+          ],
+          "defaultTransition": {
+            "targetNodeId": "nd-e05f59dd66"
+          },
+          "type": "standard",
+          "id": "nd-58fca56e01",
+          "name": "Handler",
+          "deletable": true,
+          "x": 450,
+          "y": 120
+        },
+        {
+          "id": "nd-98dc0bcc87",
+          "name": "On_Error",
+          "type": "entry",
+          "deletable": false,
+          "variables": [],
+          "instructions": [
+            {
+              "id": "trs-02c7129430",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "nd-58fca56e01"
+              },
+              "transitions": [],
+              "nodeId": "nd-98dc0bcc87"
+            }
+          ],
+          "x": 90,
+          "y": 120,
+          "defaultTransition": {
+            "targetNodeId": null
+          }
+        },
+        {
+          "id": "nd-e05f59dd66",
+          "name": "End",
+          "type": "end",
+          "variables": [],
+          "deletable": false,
+          "instructions": [
+            {
+              "id": "trs-945140a646",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "END"
+              },
+              "transitions": [],
+              "nodeId": "nd-e05f59dd66"
+            }
+          ],
+          "x": 810,
+          "y": 120
+        }
+      ]
+    },
+    {
+      "id": "wf-timeout",
+      "name": "Timeout",
+      "startNode": "nd-9f7f3268ac",
+      "variables": [],
+      "links": [
+        {
+          "id": "edg-b0d2adcd13",
+          "source": "nd-e6c012a652",
+          "sourcePort": "nd-e6c012a652",
+          "target": "nd-199fdcf439"
+        },
+        {
+          "id": "edg-6d17a0591b",
+          "source": "nd-9f7f3268ac",
+          "sourcePort": "trs-0c7a9a0003",
+          "target": "nd-e6c012a652"
+        }
+      ],
+      "nodes": [
+        {
+          "instructions": [],
+          "defaultTransition": {
+            "targetNodeId": "nd-199fdcf439"
+          },
+          "type": "standard",
+          "id": "nd-e6c012a652",
+          "name": "Handler",
+          "deletable": true,
+          "x": 435,
+          "y": 105
+        },
+        {
+          "comment": "<p><span style=\"font-size: 18px\"><strong>⌛️ When conversation times out</strong></span></p><p><br>This workflow is executed when the conversation <strong>times out</strong> before it had time to flow to an <strong>End Node</strong>.</p><p></p><p>The <strong>Timeout Delay</strong> is configurable in the <strong>Chatbot Settings.</strong></p><p></p><p>You can use this to inform the user of the situation before ending the conversation.</p>",
+          "type": "comment",
+          "id": "nd-441efa6c42",
+          "name": "Comment1",
+          "deletable": true,
+          "instructions": [],
+          "height": 173,
+          "width": 401,
+          "x": 105,
+          "y": -90
+        },
+        {
+          "id": "nd-9f7f3268ac",
+          "name": "On_Timeout",
+          "type": "entry",
+          "deletable": false,
+          "variables": [],
+          "instructions": [
+            {
+              "id": "trs-0c7a9a0003",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "nd-e6c012a652"
+              },
+              "transitions": [],
+              "nodeId": "nd-9f7f3268ac"
+            }
+          ],
+          "x": 100,
+          "y": 100,
+          "defaultTransition": {
+            "targetNodeId": null
+          }
+        },
+        {
+          "id": "nd-199fdcf439",
+          "name": "End",
+          "type": "end",
+          "variables": [],
+          "deletable": false,
+          "instructions": [
+            {
+              "id": "trs-bf76943d55",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "END"
+              },
+              "transitions": [],
+              "nodeId": "nd-199fdcf439"
+            }
+          ],
+          "x": 795,
+          "y": 105
+        }
+      ]
+    },
+    {
+      "id": "wf-conversation-end",
+      "name": "Conversation End",
+      "startNode": "nd-c0d3bd2c92",
+      "variables": [],
+      "links": [
+        {
+          "id": "edg-3cb8028ff6",
+          "source": "nd-c0d3bd2c92",
+          "sourcePort": "trs-92c6f93b0c",
+          "target": "nd-2db7499cc6"
+        },
+        {
+          "id": "edg-8a88f687a0",
+          "source": "nd-2db7499cc6",
+          "sourcePort": "nd-2db7499cc6",
+          "target": "nd-d0c2a6be81"
+        }
+      ],
+      "nodes": [
+        {
+          "instructions": [],
+          "defaultTransition": {
+            "targetNodeId": "nd-d0c2a6be81"
+          },
+          "type": "standard",
+          "id": "nd-2db7499cc6",
+          "name": "Handler",
+          "deletable": true,
+          "x": 420,
+          "y": 105
+        },
+        {
+          "comment": "<p><span style=\"font-size: 18px\"><strong>👋 Before Conversation Ends</strong></span></p><p><br>This workflow is executed when right before the conversation <strong>Ends Explicitly.</strong></p><p></p><p>An <strong>Explicit Ending</strong> happens when a workflow transitions on an <strong>End Node</strong>.</p>",
+          "type": "comment",
+          "id": "nd-6d5d3f41dd",
+          "name": "Comment1",
+          "deletable": true,
+          "instructions": [],
+          "height": 148,
+          "width": 461,
+          "x": 105,
+          "y": -45
+        },
+        {
+          "id": "nd-c0d3bd2c92",
+          "name": "On_Explicit_Ending",
+          "type": "entry",
+          "deletable": false,
+          "variables": [],
+          "instructions": [
+            {
+              "id": "trs-92c6f93b0c",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "nd-2db7499cc6"
+              },
+              "transitions": [],
+              "nodeId": "nd-c0d3bd2c92"
+            }
+          ],
+          "x": 100,
+          "y": 100,
+          "defaultTransition": {
+            "targetNodeId": null
+          }
+        },
+        {
+          "id": "nd-d0c2a6be81",
+          "name": "End",
+          "type": "end",
+          "variables": [],
+          "deletable": false,
+          "instructions": [
+            {
+              "id": "trs-7004dbb2b6",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "END"
+              },
+              "transitions": [],
+              "nodeId": "nd-d0c2a6be81"
+            }
+          ],
+          "x": 780,
+          "y": 105
+        }
+      ]
+    },
+    {
+      "topicId": "tpc-global",
+      "id": "wf-main",
+      "name": "Main",
+      "startNode": "nd-2bb9db230d",
+      "variables": [
+        {
+          "id": "var-e9c13de8f1",
+          "name": "serviceId",
+          "type": "object",
+          "description": "",
+          "typings": "Lebotfrancais_http_requestHttpRequest",
+          "scope": "workflow"
+        },
+        {
+          "id": "var-98398effab",
+          "name": "specialistId",
+          "type": "object",
+          "description": "",
+          "typings": "Lebotfrancais_http_requestHttpRequest",
+          "scope": "workflow"
+        },
+        {
+          "id": "var-1a373813c4",
+          "name": "date",
+          "type": "object",
+          "description": "",
+          "typings": "Lebotfrancais_http_requestHttpRequest",
+          "scope": "workflow"
+        },
+        {
+          "id": "var-225a7cd177",
+          "name": "respuestaNatural",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-7cc9704768",
+          "name": "intencion",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-9463342296",
+          "name": "contextoClinica",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-87886b01c4",
+          "name": "respuesta",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-23a9a695d8",
+          "name": "respuestaIA",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-941ccee717",
+          "name": "respuestaFinal",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        },
+        {
+          "id": "var-0e2f98e3b6",
+          "name": "historialTexto",
+          "description": "",
+          "type": "string",
+          "scope": "workflow",
+          "defaultValue": "",
+          "storeAsTag": false
+        }
+      ],
+      "links": [],
+      "nodes": [
+        {
+          "id": "nd-2bb9db230d",
+          "name": "Start",
+          "type": "start",
+          "deletable": false,
+          "instructions": [
+            {
+              "id": "trs-8b0779edc5",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "nd-e63252fc1b"
+              },
+              "transitions": [],
+              "nodeId": "nd-2bb9db230d"
+            }
+          ],
+          "x": -585,
+          "y": -945,
+          "kbPriority": {
+            "enabled": false,
+            "searchScope": "specific",
+            "kbs": []
+          }
+        },
+        {
+          "id": "nd-80ac4ff158",
+          "name": "End",
+          "type": "end",
+          "deletable": false,
+          "instructions": [
+            {
+              "id": "trs-0260f5e672",
+              "type": "transition",
+              "condition": {
+                "type": "expression",
+                "payload": "true"
+              },
+              "destination": {
+                "node": "END"
+              },
+              "transitions": [],
+              "nodeId": "nd-80ac4ff158"
+            },
+            {
+              "type": "log",
+              "category": "Utilities",
+              "id": "ins-28f1d4df3f",
+              "label": "Log",
+              "level": "debug",
+              "message": {
+                "valueType": "dynamic",
+                "dynamicValue": "",
+                "staticValue": ""
+              },
+              "nodeId": "nd-80ac4ff158",
+              "transitions": []
+            }
+          ],
+          "x": 825,
+          "y": -615
+        },
+        {
+          "type": "standard",
+          "deletable": true,
+          "x": -300,
+          "y": -1065,
+          "instructions": [
+            {
+              "id": "ins-0aef120965",
+              "type": "action",
+              "category": "Execute",
+              "code": "try {\n  // URL pública de tu backend (debe ser accesible desde Botpress Cloud)\n  const apiBase = 'https://TU_BACKEND_PUBLICO';\n\n  if (!user.bookingState || typeof user.bookingState !== 'object') {\n    user.bookingState = {};\n  }\n\n  const payload = {\n    message: event.preview || '',\n    state: user.bookingState\n  };\n\n  const res = await axios.post(apiBase + '/api/bot/booking/turn', payload);\n\n  if (res?.data?.state) {\n    user.bookingState = res.data.state;\n  }\n\n  workflow.respuesta =\n    res?.data?.reply || 'No pude procesar tu solicitud en este momento.';\n\n} catch (err) {\n  const detail = err?.response?.data?.message || err?.message || 'Error inesperado';\n  workflow.respuesta = 'No pude conectar con el sistema de agenda. ' + detail;\n}\n",
+              "origin": "builtin",
+              "label": "\"Booking Turn via Backend API\"",
+              "nodeId": "nd-e63252fc1b",
+              "isCustomLabel": false,
+              "transpiledCode": "var __defProp = Object.defineProperty;\nvar __name = (target, value) => __defProp(target, \"name\", { value, configurable: true });\nasync function __ROOT__() {\n  try {\n    if (!user.history) {\n      user.history = [];\n    }\n    user.history.push({\n      rol: \"usuario\",\n      mensaje: event.preview || \"\"\n    });\n    if (user.history.length > 20) {\n      user.history = user.history.slice(-20);\n    }\n    if (!user.contextoClinica) {\n      const [serviciosRes, especialistasRes] = await Promise.all([\n        axios.get(\"https://shield-liqueur-strike.ngrok-free.dev/api/bot/services?format=text\"),\n        axios.get(\"https://shield-liqueur-strike.ngrok-free.dev/api/bot/specialists?format=text\")\n      ]);\n      user.contextoClinica = `SERVICIOS:\n${serviciosRes.data.text}\n\nESPECIALISTAS:\n${especialistasRes.data.text}`;\n    }\n    workflow.historialTexto = user.history.map((m) => `${m.rol === \"usuario\" ? \"Usuario\" : \"Bot\"}: ${m.mensaje}`).join(\"\\n\");\n    workflow.contextoClinica = user.contextoClinica;\n  } catch (err) {\n    workflow.contextoClinica = \"Error: \" + err.message;\n    workflow.historialTexto = \"\";\n  }\n  ;\n}\n__name(__ROOT__, \"__ROOT__\");\n; return await __ROOT__();",
+              "transitions": []
+            }
+          ],
+          "defaultTransition": {
+            "targetNodeId": "nd-99a1c4c1be"
+          },
+          "id": "nd-e63252fc1b",
+          "name": "Standard2"
+        },
+        {
+          "type": "standard",
+          "deletable": true,
+          "x": -270,
+          "y": -780,
+          "instructions": [
+            {
+              "type": "ai",
+              "category": "AI",
+              "id": "ins-599086f3af",
+              "label": "respuesta, respuestaIA",
+              "task": {
+                "instructions": "Eres el asistente virtual de Healthy Teeth Clinic, clínica odontológica premium en Bogotá.\n\nPERSONALIDAD:\n- Cálido, profesional, cercano. Hablas en español, de \"tú\".\n- Respuestas cortas (máximo 4-5 líneas).\n- 1-2 emojis máximo por respuesta.\n\nINFO CLÍNICA:\n- Dirección: Calle 93 #12-45, Consultorio 301, Bogotá\n- Teléfono: +57 601 555 0123 | WhatsApp: +57 300 555 0123\n- Horarios: L-V 7AM-7PM | Sáb 8AM-2PM\n\nREGLAS CRÍTICAS:\n1. LEE SIEMPRE el HISTORIAL antes de responder. Mantén coherencia con lo que ya hablaron.\n2. Si ya saludaste antes, NO vuelvas a saludar. Continúa la conversación donde quedó.\n3. NUNCA inventes servicios, precios o especialistas que no estén en CONTEXTO.\n4. Si el usuario está en medio de un flujo de agendamiento, sigue pidiendo lo que falta sin reiniciar.\n\nAGENDAMIENTO:\nSi el usuario quiere agendar, guíalo paso a paso pidiendo UN dato por turno:\n1. Nombre completo → ya dio? avanza al 2\n2. Email → ya dio? avanza al 3\n3. Teléfono → ya dio? avanza al 4\n4. Qué servicio necesita (verifica CONTEXTO)\n5. Especialista preferido (sugiere uno según el servicio)\n6. Fecha tentativa (no en pasado, en formato DD de MES)\n7. Hora (formato HH:MM)\n8. Motivo breve\n\nCuando tengas TODO, muestra un resumen y dile: \"Para confirmar tu cita visita https://tu-sitio.com/agendar con esta información, o escríbenos por WhatsApp al +57 300 555 0123 y terminamos de agendarla\".\n\nCONTEXTO (servicios y especialistas):\n{{workflow.contextoClinica}}\n\nHISTORIAL DE LA CONVERSACIÓN:\n{{workflow.historialTexto}}\n",
+                "input": "Mensaje actual del usuario: {{event.preview}}",
+                "outputVariableIds": [
+                  "var-87886b01c4"
+                ],
+                "handleFailure": false,
+                "examples": [
+                  {
+                    "input": "",
+                    "output": {}
+                  }
+                ],
+                "model": "fast-model",
+                "temperature": 0,
+                "version": "1.0"
+              },
+              "nodeId": "nd-7a0343fea6",
+              "transitions": [],
+              "prompt": {
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You are a helper assistant at the hands of a chatbot developer using Botpress workflow editor. Your main goal is to generate useful content in JSON format for the developer to use.\nHere are the task instructions provided by the developer:"
+                  },
+                  {
+                    "role": "user",
+                    "content": "I have a task for you to complete. Here are the instructions:\nEres el asistente virtual de Healthy Teeth Clinic, clínica odontológica premium en Bogotá.\n\nPERSONALIDAD:\n- Cálido, profesional, cercano. Hablas en español, de \"tú\".\n- Respuestas cortas (máximo 4-5 líneas).\n- 1-2 emojis máximo por respuesta.\n\nINFO CLÍNICA:\n- Dirección: Calle 93 #12-45, Consultorio 301, Bogotá\n- Teléfono: +57 601 555 0123 | WhatsApp: +57 300 555 0123\n- Horarios: L-V 7AM-7PM | Sáb 8AM-2PM\n\nREGLAS CRÍTICAS:\n1. LEE SIEMPRE el HISTORIAL antes de responder. Mantén coherencia con lo que ya hablaron.\n2. Si ya saludaste antes, NO vuelvas a saludar. Continúa la conversación donde quedó.\n3. NUNCA inventes servicios, precios o especialistas que no estén en CONTEXTO.\n4. Si el usuario está en medio de un flujo de agendamiento, sigue pidiendo lo que falta sin reiniciar.\n\nAGENDAMIENTO:\nSi el usuario quiere agendar, guíalo paso a paso pidiendo UN dato por turno:\n1. Nombre completo → ya dio? avanza al 2\n2. Email → ya dio? avanza al 3\n3. Teléfono → ya dio? avanza al 4\n4. Qué servicio necesita (verifica CONTEXTO)\n5. Especialista preferido (sugiere uno según el servicio)\n6. Fecha tentativa (no en pasado, en formato DD de MES)\n7. Hora (formato HH:MM)\n8. Motivo breve\n\nCuando tengas TODO, muestra un resumen y dile: \"Para confirmar tu cita visita https://tu-sitio.com/agendar con esta información, o escríbenos por WhatsApp al +57 300 555 0123 y terminamos de agendarla\".\n\nCONTEXTO (servicios y especialistas):\n{{workflow.contextoClinica}}\n\nHISTORIAL DE LA CONVERSACIÓN:\n{{workflow.historialTexto}}\n\n--\nThe following is the typescript interface I need as output of the task:\n\n```typescript\ninterface Output = {\n  /**  */\n\"respuesta\": string\n/**  */\n\"respuestaIA\": string\n}"
+                  },
+                  {
+                    "role": "user",
+                    "content": "Now, here is the actual input to the task at hand you need to complete:\nInput:\n\"\"\"\n{{TASK_INPUT}}\n\"\"\"\nPlease follow my instructions as is and complete the task by filling the output JSON below with the correct values. Your answer must strictly respect the typescript typings.\nYou don't have to explain your answer and remember I need valid JSON as output.\n\nI need to generate the following output:\n\n```typescript\nconst output: Output = JSON.parse(<<json_output>>)\n```\n\nYour answer must strictly respect the typescript typings.\nHow would you write <<json_output>> ?\nAnswer with JSON and only JSON. Don't explain your answer, just JSON."
+                  }
+                ],
+                "model": "fast-model",
+                "temperature": 0
+              }
+            }
+          ],
+          "defaultTransition": {
+            "targetNodeId": "nd-99a1c4c1be"
+          },
+          "id": "nd-7a0343fea6",
+          "name": "Standard1"
+        },
+        {
+          "type": "standard",
+          "deletable": true,
+          "x": 165,
+          "y": -585,
+          "instructions": [
+            {
+              "id": "ins-f2f4054c0f",
+              "category": "Send Messages",
+              "type": "content",
+              "label": "text",
+              "content": {
+                "type": "text",
+                "text": {
+                  "valueType": "dynamic",
+                  "dynamicValue": "{{workflow.respuesta}}",
+                  "staticValue": ""
+                },
+                "typing": {
+                  "valueType": "static",
+                  "staticValue": true
+                }
+              },
+              "nodeId": "nd-99a1c4c1be",
+              "transitions": []
+            }
+          ],
+          "defaultTransition": {
+            "targetNodeId": null
+          },
+          "id": "nd-99a1c4c1be",
+          "name": "Standard4"
+        },
+        {
+          "type": "standard",
+          "deletable": true,
+          "x": 690,
+          "y": -525,
+          "instructions": [
+            {
+              "id": "ins-7b768c8d93",
+              "type": "action",
+              "category": "Execute",
+              "code": "// Nodo opcional: sin lógica adicional.\n// Si quieres reiniciar estado manualmente, descomenta:\n// user.bookingState = {};\n",
+              "origin": "builtin",
+              "label": "Execute code",
+              "nodeId": "nd-2bd7ecf113",
+              "transpiledCode": "var __defProp = Object.defineProperty;\nvar __name = (target, value) => __defProp(target, \"name\", { value, configurable: true });\nasync function __ROOT__() {\n  if (user.history && workflow.respuesta) {\n    user.history.push({\n      rol: \"bot\",\n      mensaje: workflow.respuesta\n    });\n  }\n  ;\n}\n__name(__ROOT__, \"__ROOT__\");\n; return await __ROOT__();",
+              "transitions": []
+            }
+          ],
+          "defaultTransition": {
+            "targetNodeId": null
+          },
+          "id": "nd-2bd7ecf113",
+          "name": "Standard6"
+        }
+      ],
+      "parentFolder": "root"
+    }
+  ],
+  "intents": [
+    {
+      "id": "int-cancel",
+      "name": "cancel",
+      "utterances_with_slots": [
+        "cancel",
+        "abort",
+        "abandon",
+        "i want to cancel",
+        "forget about this",
+        "leave",
+        "stop",
+        "quit",
+        "you know what, nevermind",
+        "forget it"
+      ]
+    },
+    {
+      "id": "int-no",
+      "name": "no",
+      "utterances_with_slots": [
+        "no",
+        "i don't want to",
+        "absolutely not",
+        "nah",
+        "nope",
+        "not really",
+        "not sure",
+        "no thanks"
+      ]
+    },
+    {
+      "id": "int-yes",
+      "name": "yes",
+      "utterances_with_slots": [
+        "yes",
+        "yeah",
+        "absolutely",
+        "i'd like to",
+        "sure ",
+        "hmm probably",
+        "yup",
+        "ok"
+      ]
+    }
+  ],
+  "list_entities": [],
+  "pattern_entities": [],
+  "actions": [],
+  "hooks": [
+    {
+      "id": "hk-99mudt",
+      "name": "track_iterations",
+      "hookType": "after_llmz_execution",
+      "content": "await actions[\"agi/improvement\"].trackIterations({\n  iterations: execution.iterations.map((iteration) => ({\n    uri: `workflow://${execution.location?.workflowId}/${execution.location?.nodeId}`,\n    conversationId: event.conversationId!,\n    executionId: execution.context.id,\n    iterationId: iteration.id,\n    eventId: event.messageId ?? event.id,\n    userId: event.userId!,\n    iteration: {\n      code: iteration.code ?? \"\",\n      ended_ts: iteration.ended_ts,\n      started_ts: iteration.started_ts,\n      messages: iteration.messages,\n      model: iteration.llm.model,\n      mutations: iteration.mutations,\n      status: iteration.status,\n    },\n  })),\n});\n",
+      "title": "Track LLMz Iterations",
+      "description": "This hook tracks iterations after LLMz execution",
+      "origin": {
+        "type": "integration",
+        "integration": {
+          "id": "agi/improvement",
+          "name": "agi/improvement",
+          "version": "1.0.2",
+          "title": "Improvement"
+        }
+      },
+      "transpiledCode": "var __defProp = Object.defineProperty;\nvar __name = (target, value) => __defProp(target, \"name\", { value, configurable: true });\nasync function __ROOT__() {\n  await actions[\"agi/improvement\"].trackIterations({\n    iterations: execution.iterations.map((iteration) => ({\n      uri: `workflow://${execution.location?.workflowId}/${execution.location?.nodeId}`,\n      conversationId: event.conversationId,\n      executionId: execution.context.id,\n      iterationId: iteration.id,\n      eventId: event.messageId ?? event.id,\n      userId: event.userId,\n      iteration: {\n        code: iteration.code ?? \"\",\n        ended_ts: iteration.ended_ts,\n        started_ts: iteration.started_ts,\n        messages: iteration.messages,\n        model: iteration.llm.model,\n        mutations: iteration.mutations,\n        status: iteration.status\n      }\n    }))\n  });\n  ;\n}\n__name(__ROOT__, \"__ROOT__\");\n; return await __ROOT__();"
+    },
+    {
+      "id": "hk-1q8lg5q",
+      "name": "inject_learnings",
+      "hookType": "before_llmz_execution",
+      "content": "async function runFindFeedback() {\n  const search = context.transcript.map((x) => `${x.role}: ${x.content}`).join(\"\\n\")\n  if (!search) {\n    // nothing to search for\n    return\n  }\n\n  const { items } = await actions[\"agi/improvement\"].findFeedback({\n    uri: `workflow://${context.location?.workflowId}/${context.location?.nodeId}`,\n    search,\n  });\n\n  if (!items.length) {\n    return\n  }\n\n  context.instructions += `\n\n## Learnings from Previous Experiences\n\n${items\n  .map(\n    (x, i) => `### Learning ${i + 1}\n${x.learning}\n`\n  )\n  .join(\"\\n\")}\n  `;\n}\n\nawait runFindFeedback()",
+      "title": "Provide Learnings to LLMz",
+      "description": "This hook injects learnings into LLMz before execution",
+      "origin": {
+        "type": "integration",
+        "integration": {
+          "id": "agi/improvement",
+          "name": "agi/improvement",
+          "version": "1.0.2",
+          "title": "Improvement"
+        }
+      },
+      "transpiledCode": "var __defProp = Object.defineProperty;\nvar __name = (target, value) => __defProp(target, \"name\", { value, configurable: true });\nasync function __ROOT__() {\n  async function runFindFeedback() {\n    const search = context.transcript.map((x) => `${x.role}: ${x.content}`).join(\"\\n\");\n    if (!search) {\n      return;\n    }\n    const { items } = await actions[\"agi/improvement\"].findFeedback({\n      uri: `workflow://${context.location?.workflowId}/${context.location?.nodeId}`,\n      search\n    });\n    if (!items.length) {\n      return;\n    }\n    context.instructions += `\n\n## Learnings from Previous Experiences\n\n${items.map(\n      (x, i) => `### Learning ${i + 1}\n${x.learning}\n`\n    ).join(\"\\n\")}\n  `;\n  }\n  __name(runFindFeedback, \"runFindFeedback\");\n  await runFindFeedback();\n}\n__name(__ROOT__, \"__ROOT__\");\n; return await __ROOT__();"
+    }
+  ],
+  "qnas": [],
+  "folders": [],
+  "agents": {
+    "SummaryAgent": {
+      "enabled": false,
+      "config": {
+        "summaryMaxTokens": 100,
+        "transcriptMaxLines": 10,
+        "model": "fast-model"
+      }
+    },
+    "TranslatorAgent": {
+      "config": {
+        "detectLanguage": true
+      }
+    },
+    "KnowledgeAgent": {
+      "enabled": false,
+      "config": {
+        "answerManually": true,
+        "context": "Summary of the conversation:\n\"\"\"\n{{conversation.SummaryAgent.summary}}\n\"\"\"\n\nTranscript:\n\"\"\"\n{{conversation.SummaryAgent.transcript}}\n\"\"\"",
+        "bestModel": "gpt-4-turbo",
+        "fastestModel": "fast-model",
+        "questionModel": "fast-model",
+        "strategy": "hybrid",
+        "chunks": 50
+      }
+    },
+    "PersonalityAgent": {
+      "config": {
+        "active": true,
+        "personality": {
+          "valueType": "dynamic",
+          "dynamicValue": "Tu personalidad:\n- Amable, profesional y cercano\n- Respondes siempre en español\n- Claro y conciso (respuestas cortas)\n- Usas emojis con moderación (🦷 😊)\n\nInformación de la clínica:\n- Dirección: Calle 93 #12-45, Consultorio 301, Bogotá\n- Teléfono: +57 601 555 0123\n- WhatsApp: +57 300 555 0123\n- Horarios: Lunes a Viernes 7:00 AM - 7:00 PM | Sábado 8:00 AM - 2:00 PM\n- Correo: contacto@healthyteethclinic.com\n\nTus capacidades:\n1. Responder preguntas generales sobre la clínica (horarios, ubicación, contacto)\n2. Mostrar los servicios disponibles usando la herramienta \"Listar servicios\"\n3. Mostrar los especialistas disponibles usando \"Listar especialistas\" (puedes filtrar por servicio)\n4. Consultar disponibilidad de horarios con \"Consultar disponibilidad\"\n5. Agendar citas con \"Crear cita\" recopilando todos los datos necesarios\n\nReglas importantes:\n- NUNCA inventes servicios, precios, especialistas o horarios. SIEMPRE usa las herramientas.\n- Para agendar una cita necesitas: nombre completo, email, teléfono, servicio, especialista, fecha (YYYY-MM-DD), hora (HH:MM), motivo de la consulta, y consentimiento de datos.\n- Pregunta los datos uno a uno o de a dos, no todos de golpe.\n- Si no tienes claro algo, pregunta.\n- Al confirmar una cita, muestra un resumen y pide confirmación antes de crear.\n- Después de crear la cita exitosamente, avisa que recibirá un correo de confirmación.\n\nSi el usuario quiere un servicio específico, usa \"Listar especialistas\" filtrando por ese servicio para mostrarle quiénes lo atienden.",
+          "staticValue": ""
+        },
+        "model": "fast-model"
+      }
+    },
+    "VisionAgent": {
+      "enabled": true,
+      "config": {
+        "extractionEnabled": true,
+        "model": "openai__gpt-4o-2024-11-20"
+      }
+    }
+  },
+  "tables": {
+    "table_01KNTD2N4X7J72ANGJWG6EDKVR": {
+      "id": "table_01KNTD2N4X7J72ANGJWG6EDKVR",
+      "name": "RouterAgentTable",
+      "factor": 1,
+      "frozen": false,
+      "keyColumn": null,
+      "tags": {
+        "role": "agents/router/intents",
+        "agent": "RouterAgent",
+        "system": "true"
+      },
+      "createdAt": "2026-04-10T00:36:08.988Z",
+      "updatedAt": "2026-04-10T00:36:08.988Z",
+      "createdBy": "user:0b49e814-dcef-4176-873e-b23378e4332b",
+      "updatedBy": null,
+      "isComputeEnabled": false,
+      "unavailableColumns": [],
+      "schema": {
+        "type": "object",
+        "x-zui": {},
+        "required": [
+          "phrase",
+          "intentId",
+          "phraseId"
+        ],
+        "properties": {
+          "phrase": {
+            "type": "string",
+            "x-zui": {
+              "index": 0,
+              "searchable": true
+            }
+          },
+          "intentId": {
+            "type": "string",
+            "x-zui": {
+              "index": 1,
+              "searchable": true
+            }
+          },
+          "phraseId": {
+            "type": "string",
+            "x-zui": {
+              "index": 2,
+              "searchable": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "parentFolder": "root",
+      "selectors": []
+    },
+    "table_01KNTD2N7W60T6J4DNR3C9GR5P": {
+      "id": "table_01KNTD2N7W60T6J4DNR3C9GR5P",
+      "name": "Int_Improvement_Feedback_Table",
+      "factor": 30,
+      "frozen": true,
+      "keyColumn": null,
+      "tags": {
+        "origin": "integration",
+        "purpose": "improvement",
+        "version": "Nov-2024",
+        "integration": "Int_Improvement",
+        "x-studio-icon": "lucide://atom",
+        "x-studio-color": "green",
+        "x-studio-title": "Feedback",
+        "x-studio-readonly": "true",
+        "x-studio-description": "Table to store acquired feedback on iterations for active learning"
+      },
+      "createdAt": "2026-04-10T00:36:09.082Z",
+      "updatedAt": "2026-04-10T00:36:09.082Z",
+      "createdBy": "user:0b49e814-dcef-4176-873e-b23378e4332b",
+      "updatedBy": null,
+      "isComputeEnabled": true,
+      "unavailableColumns": [],
+      "schema": {
+        "type": "object",
+        "x-zui": {},
+        "required": [
+          "uri",
+          "after",
+          "before",
+          "feedback",
+          "iterationId"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "x-zui": {
+              "index": 0,
+              "searchable": true
+            },
+            "maxLength": 250,
+            "minLength": 1
+          },
+          "after": {
+            "type": "string",
+            "x-zui": {
+              "index": 1,
+              "searchable": true
+            },
+            "minLength": 1
+          },
+          "before": {
+            "type": "string",
+            "x-zui": {
+              "index": 2,
+              "searchable": true
+            },
+            "minLength": 1
+          },
+          "feedback": {
+            "type": "string",
+            "x-zui": {
+              "index": 3,
+              "searchable": true
+            },
+            "minLength": 1
+          },
+          "learning": {
+            "type": "string",
+            "x-zui": {
+              "index": 4,
+              "computed": {
+                "model": "fast-model",
+                "action": "ai",
+                "prompt": "What would you tell your future self to improve next time?\nCode Before:\n\n```\n{{before}}\n```\n\nFeedback: \"{{feedback}}\"\n\nCode After:\n\n```\n{{after}}\n```\n\nFor the learning, it must be standalone, concise but also accurately depict the situation and feedback you were given.\n\nTry to follow one of the below structures:\n\n<example>\nIn [situation X], I learned that I should [use tool `X` rather than `Y` because ...]\n\n\\`\\`\\`\n// snippet using the right tool\n\\`\\`\\`\n</example>\n\n<example>\nWhen trying to [...], I should use [tool X, tool Y or tool Z] like this:\n\n\\`\\`\\`\n// snippet to explain a drastic code change between before and after, or a non-obvious code snippet\n\\`\\`\\`\n</example>\n\n<example>\nWhenever [Y] happens, I should avoid [...] and instead [...].\n\n\\`\\`\\`\n// snippet to implement the behavior change\n\\`\\`\\`\n</example>\n\nKeep it concise. Do not refer to \"this situation\" or to the feedback. Both have been provided by an expert reviewing the conversation, NOT the actual user. So you must embed the content from the above inside your learning so it is standalone.\nMake sure to include a code snippet that teaches the right behavior, but remaining generic enough to adapt to different conversations in the future.\n",
+                "dependencies": [
+                  "before",
+                  "feedback",
+                  "after"
+                ]
+              },
+              "searchable": true
+            },
+            "default": null,
+            "nullable": true,
+            "minLength": 1
+          },
+          "iterationId": {
+            "type": "string",
+            "x-zui": {
+              "index": 5,
+              "searchable": true
+            },
+            "maxLength": 100,
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      },
+      "parentFolder": "root",
+      "selectors": []
+    }
+  },
+  "schemas": [],
+  "versions": [
+    {
+      "name": "13 Apr 26 10:11",
+      "id": "version_01KP3PC6RWQ96Q1NX5PV7BQ4MR"
+    },
+    {
+      "name": "13 Apr 26 10:07",
+      "id": "version_01KP3P4YT28JFY22P2CSKR44HR"
+    },
+    {
+      "name": "13 Apr 26 09:42",
+      "id": "version_01KP3MP5TYFF0VTZ0VDPMYDN5V"
+    }
+  ],
+  "revision": 507,
+  "revisionMetadata": {
+    "lastRevisionCheckAt": "2026-04-13T15:21:22.973Z",
+    "lastRevisionId": 506,
+    "multiplayerStatus": "connected",
+    "multiplayerTraces": [
+      "2026-04-13T15:03:45.600Z (q9_yQIqGYk): ingenierohenrydavid@gmail.com was elected as master - \"sess_01KP3NXB6EGN5SM0NE0SHGQ0E9\"",
+      "2026-04-13T15:21:09.851Z: Connection State: connected -> closing (Connection closing)",
+      "2026-04-13T15:21:09.856Z: Connection State: closing -> closed (Connection closed)",
+      "2026-04-13T15:21:09.857Z: Disconnecting multiplayer session...",
+      "2026-04-13T15:21:09.862Z: Multiplayer session disconnected!",
+      "2026-04-13T15:21:09.867Z: Initializing Client... - {\"initializing\":false,\"initialized\":false}",
+      "2026-04-13T15:21:09.929Z: Connection State: initialized -> connecting (ok)",
+      "2026-04-13T15:21:10.316Z (O-4rplEqhi): Connection State: connecting -> connected (ok)",
+      "2026-04-13T15:21:10.463Z (O-4rplEqhi): Multiplayer session initialized!",
+      "2026-04-13T15:21:10.550Z (O-4rplEqhi): Player entered channel - {\"sessionId\":\"sess_01KP3NXB6EGN5SM0NE0SHGQ0E9\",\"connectionId\":\"O-4rplEqhi\",\"joinedAt\":\"2026-04-13T15:21:10.463Z\",\"email\":\"ingenierohenrydavid@gmail.com\",\"displayName\":\"Henry David Tordecilla López\",\"color\":\"var(--grass-8)\",\"workspaceUserId\":\"0b49e814-dcef-4176-873e-b23378e4332b\",\"lastActiveAt\":\"Mon, 13 Apr 2026 15:03:45 GMT\",\"connectedAt\":\"Mon, 13 Apr 2026 15:03:45 GMT\",\"sections\":[]}"
+    ],
+    "players": [
+      "ingenierohenrydavid@gmail.com / sess_01KP3NXB6EGN5SM0NE0SHGQ0E9 / Mon, 13 Apr 2026 15:03:45 GMT /  2026-04-13T15:21:30.317Z"
+    ],
+    "savedAt": "2026-04-13T15:21:33.508Z",
+    "savedBy": "ingenierohenrydavid@gmail.com",
+    "sessionId": "sess_01KP3NXB6EGN5SM0NE0SHGQ0E9"
+  },
+  "identity": {
+    "name": "Healthy Teeth Assistant",
+    "manual_instructions": "",
+    "icon": {
+      "type": "emoji",
+      "emoji": "🤖 ",
+      "background_color": "oklch(var(--color-orange-500))"
+    },
+    "ai_summary": {
+      "value": "Chatbot named sparkling-eland provides concise information.",
+      "input_hash": "7j8s9",
+      "generated_at": "2025-02-26T18:41:46.789Z",
+      "version": "1.0.0"
+    }
+  }
+}

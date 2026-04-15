@@ -1,5 +1,9 @@
-import { BotService } from './bot.service';
+import { BotBookingState, BotService } from './bot.service';
 import { CreateAppointmentDto } from '../appointments/dto/create-appointment.dto';
+interface BookingTurnDto {
+    message?: string;
+    state?: Partial<BotBookingState>;
+}
 export declare class BotController {
     private readonly botService;
     constructor(botService: BotService);
@@ -29,4 +33,6 @@ export declare class BotController {
         date: string;
         time: string;
     }>;
+    bookingTurn(body: BookingTurnDto): Promise<import("./bot.service").BotBookingTurnResponse>;
 }
+export {};
