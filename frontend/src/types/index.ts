@@ -14,6 +14,55 @@ export interface IUser {
   updatedAt: string;
 }
 
+export type DocumentType = 'CC' | 'TI' | 'CE' | 'PP' | 'RC' | 'otro';
+export type PatientSex = 'M' | 'F' | 'O';
+
+export interface IEmergencyContact {
+  name: string;
+  phone: string;
+  relationship?: string;
+}
+
+export interface IMedicalInfo {
+  allergies: string[];
+  diseases: string[];
+  medications: string[];
+  medicalHistory?: string;
+  dentalHistory?: string;
+}
+
+export interface IPatient {
+  _id: string;
+  documentType: DocumentType;
+  documentNumber: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  sex: PatientSex;
+  phone: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  insuranceProvider?: string;
+  emergencyContact?: IEmergencyContact;
+  medicalInfo: IMedicalInfo;
+  observations?: string;
+  isActive: boolean;
+  deletedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IPaginatedPatients {
+  items: IPatient[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface IService {
   _id: string;
   name: string;

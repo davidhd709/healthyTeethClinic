@@ -12,6 +12,7 @@ import {
   X,
   Sparkles,
   ShieldCheck,
+  UserRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,12 @@ const navItems: NavItem[] = [
     href: '/admin/especialistas',
     icon: Users,
     permission: 'specialists.manage',
+  },
+  {
+    label: 'Pacientes',
+    href: '/admin/pacientes',
+    icon: UserRound,
+    permission: 'patients.view',
   },
   {
     label: 'Citas',

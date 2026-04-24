@@ -49,6 +49,10 @@ let Appointment = class Appointment {
 };
 exports.Appointment = Appointment;
 __decorate([
+    (0, mongoose_1.Prop)({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient', index: true }),
+    __metadata("design:type", mongoose.Types.ObjectId)
+], Appointment.prototype, "patientId", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Appointment.prototype, "patientName", void 0);

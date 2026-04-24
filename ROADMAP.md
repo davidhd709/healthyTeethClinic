@@ -4,7 +4,7 @@
 > Objetivo: convertir la app actual (agenda + dashboard + servicios + especialistas) en un sistema odontológico profesional completo.
 
 **Última actualización:** 2026-04-24
-**Estado global:** Fases 0 y 1 completadas — Listo para iniciar Fase 2 (Pacientes)
+**Estado global:** Fases 0, 1 y 2 completadas — Listo para iniciar Fase 3 (Historia clínica)
 
 ---
 
@@ -170,52 +170,59 @@ Objetivo: multi-usuario con roles `admin | specialist | receptionist`.
 
 ### Fase 2 — Gestión avanzada de pacientes
 
-**Estado:** Pendiente
-**Inicio:** —
-**Fin:** —
+**Estado:** Completada
+**Inicio:** 2026-04-24
+**Fin:** 2026-04-24
 **Depende de:** Fase 1
 **Bloquea a:** Fases 3, 4, 5
 
 Objetivo: CRUD completo de pacientes con perfil por pestañas.
 
 #### Backend — archivos nuevos
-- [ ] `backend/src/modules/patients/patients.module.ts`
-- [ ] `backend/src/modules/patients/patients.controller.ts`
-- [ ] `backend/src/modules/patients/patients.service.ts`
-- [ ] `backend/src/modules/patients/schemas/patient.schema.ts`
-- [ ] `backend/src/modules/patients/dto/create-patient.dto.ts`
-- [ ] `backend/src/modules/patients/dto/update-patient.dto.ts`
-- [ ] `backend/src/modules/patients/dto/query-patient.dto.ts`
-- [ ] `backend/src/scripts/migrate-appointments-to-patients.ts`
+- [x] `backend/src/modules/patients/patients.module.ts`
+- [x] `backend/src/modules/patients/patients.controller.ts`
+- [x] `backend/src/modules/patients/patients.service.ts`
+- [x] `backend/src/modules/patients/schemas/patient.schema.ts`
+- [x] `backend/src/modules/patients/dto/create-patient.dto.ts`
+- [x] `backend/src/modules/patients/dto/update-patient.dto.ts`
+- [x] `backend/src/modules/patients/dto/query-patient.dto.ts`
+- [x] `backend/src/scripts/migrate-appointments-to-patients.ts`
 
 #### Backend — archivos modificados
-- [ ] `backend/src/app.module.ts` — registra `PatientsModule`
-- [ ] `backend/src/modules/appointments/schemas/appointment.schema.ts` — añade `patientId?` (opcional, no rompe citas viejas)
-- [ ] `backend/src/modules/appointments/appointments.service.ts` — al crear cita, resuelve/crea paciente por documento
+- [x] `backend/src/app.module.ts` — registra `PatientsModule`
+- [x] `backend/src/modules/appointments/schemas/appointment.schema.ts` — añade `patientId?` (opcional, no rompe citas viejas)
+- [x] `backend/src/modules/appointments/appointments.module.ts` — importa `PatientsModule` con `forwardRef`
+- [x] `backend/src/modules/appointments/appointments.service.ts` — al crear cita, resuelve/crea paciente por documento; añade `findByPatient`
+- [x] `backend/package.json` — script `migrate:patients`
 
 #### Frontend — archivos nuevos
-- [ ] `frontend/src/app/admin/pacientes/page.tsx` — listado con búsqueda y filtros
-- [ ] `frontend/src/app/admin/pacientes/nuevo/page.tsx`
-- [ ] `frontend/src/app/admin/pacientes/[id]/page.tsx` — perfil con tabs
-- [ ] `frontend/src/app/admin/pacientes/[id]/editar/page.tsx`
-- [ ] `frontend/src/components/patients/PatientForm.tsx`
-- [ ] `frontend/src/components/patients/PatientCard.tsx`
-- [ ] `frontend/src/components/patients/PatientProfileTabs.tsx`
-- [ ] `frontend/src/components/patients/PatientsTable.tsx`
-- [ ] `frontend/src/components/patients/PatientFilters.tsx`
-- [ ] `frontend/src/components/patients/PatientSummary.tsx`
-- [ ] `frontend/src/lib/validations/patient.schema.ts` — Zod
+- [x] `frontend/src/app/admin/pacientes/page.tsx` — listado con búsqueda paginada y filtro activo/inactivo
+- [x] `frontend/src/app/admin/pacientes/nuevo/page.tsx`
+- [x] `frontend/src/app/admin/pacientes/[id]/page.tsx` — perfil con 7 tabs
+- [x] `frontend/src/app/admin/pacientes/[id]/editar/page.tsx`
+- [x] `frontend/src/components/patients/PatientForm.tsx` — RHF + Zod, tags para alergias/enfermedades/medicamentos
+- [x] `frontend/src/components/patients/PatientsTable.tsx`
+- [x] `frontend/src/components/patients/PatientProfileTabs.tsx` — tabs funcionales: Resumen, Citas, Observaciones; placeholders bien señalizados para fases 3/4/5/9
+- [x] `frontend/src/lib/validations/patient.schema.ts` — Zod
+- [x] `frontend/src/lib/patient-utils.ts` — `calculateAge`, `fullName`, labels, `initials`
+- [-] `frontend/src/components/patients/PatientCard.tsx` — descartado (no necesario aún; tabla cubre el caso)
+- [-] `frontend/src/components/patients/PatientFilters.tsx` — descartado (inline en page)
+- [-] `frontend/src/components/patients/PatientSummary.tsx` — integrado dentro de `PatientProfileTabs`
 
 #### Frontend — archivos modificados
-- [ ] `frontend/src/components/admin/AdminSidebar.tsx` — ítem "Pacientes"
-- [ ] `frontend/src/types/index.ts` — `IPatient`
+- [x] `frontend/src/components/admin/AdminSidebar.tsx` — ítem "Pacientes" con permiso `patients.view`
+- [x] `frontend/src/types/index.ts` — `IPatient`, `IMedicalInfo`, `IEmergencyContact`, `IPaginatedPatients`, `DocumentType`, `PatientSex`
 
 #### Criterios de aceptación
-- [ ] Documento único por paciente.
-- [ ] Edad calculada automáticamente a partir de fecha de nacimiento.
-- [ ] Búsqueda por nombre/documento/teléfono/correo funciona.
-- [ ] Citas previas del paciente aparecen en su pestaña "Citas".
-- [ ] No se eliminan pacientes físicamente; solo `isActive=false`.
+- [x] Documento único por paciente (validado en schema + service + DTO).
+- [x] Edad calculada automáticamente a partir de fecha de nacimiento (helper `calculateAge`).
+- [x] Búsqueda por nombre/documento/teléfono/correo funciona (backend con `$or` + regex escapada).
+- [x] Citas previas del paciente aparecen en su pestaña "Citas" vía `GET /api/patients/:id/appointments`.
+- [x] No se eliminan pacientes físicamente; borrado lógico con `isActive=false` + `deletedAt`.
+- [x] Audit trail: `createdBy`, `updatedBy` desde `@CurrentUser()`.
+- [x] Al crear una cita: se busca/crea paciente por documento (link opcional, no bloqueante).
+- [x] Migración idempotente: `npm run migrate:patients` vincula citas existentes sin duplicar.
+- [x] Permisos: admin + recepcionista gestionan; especialista solo ve.
 
 ---
 
@@ -540,6 +547,17 @@ Objetivo: subida de radiografías, fotos y documentos a Cloudinary.
   - Sidebar: ítem "Usuarios" visible solo para admin.
   - `useAuth` refactorizado a `useSyncExternalStore` para cumplir con las reglas de React 19.
   - Backend build OK. Frontend lint + type-check OK (0 errores introducidos).
+- **Fase 2 completada:**
+  - Módulo `patients` completo: schema con documento único, borrado lógico, audit trail (`createdBy`/`updatedBy`), subdocumentos `emergencyContact` y `medicalInfo`.
+  - `AppointmentsModule` ahora resuelve/crea paciente por documento al crear cita (links vía `patientId` opcional, snapshot histórico preservado).
+  - Nuevo endpoint `GET /api/patients/:id/appointments` para la pestaña "Citas" del perfil.
+  - Script idempotente `npm run migrate:patients` para vincular citas existentes.
+  - Frontend: 4 páginas (`/admin/pacientes`, `/nuevo`, `/[id]`, `/[id]/editar`), perfil con 7 pestañas.
+  - `PatientForm` con React Hook Form + Zod, tags interactivas para alergias/enfermedades/medicamentos.
+  - Pestañas "Historia clínica", "Odontograma", "Procedimientos" y "Archivos" muestran placeholders claros con referencia a su fase.
+  - Búsqueda con debounce + paginación server-side.
+  - Permisos: admin y recepcionista gestionan; especialista solo ve.
+  - Backend build OK. Frontend lint + type-check OK.
 
 ---
 

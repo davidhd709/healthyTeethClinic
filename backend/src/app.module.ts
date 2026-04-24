@@ -10,6 +10,7 @@ import { AvailabilityModule } from './modules/availability/availability.module';
 import { ContactModule } from './modules/contact/contact.module';
 import { SeedModule } from './modules/seed/seed.module';
 import { BotModule } from './modules/bot/bot.module';
+import { PatientsModule } from './modules/patients/patients.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { BotModule } from './modules/bot/bot.module';
     AuthModule,
     ServicesModule,
     SpecialistsModule,
+    PatientsModule,
     AppointmentsModule,
     AvailabilityModule,
     ContactModule,

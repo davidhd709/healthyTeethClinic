@@ -22,13 +22,23 @@ const date_util_1 = require("../../common/utils/date.util");
 const email_service_1 = require("../integrations/email.service");
 const google_calendar_service_1 = require("../integrations/google-calendar.service");
 const google_sheets_service_1 = require("../integrations/google-sheets.service");
+const patients_service_1 = require("../patients/patients.service");
 let AppointmentsService = AppointmentsService_1 = class AppointmentsService {
-    constructor(appointmentModel, emailService, calendarService, sheetsService) {
+    constructor(appointmentModel, emailService, calendarService, sheetsService, patientsService) {
         this.appointmentModel = appointmentModel;
         this.emailService = emailService;
         this.calendarService = calendarService;
         this.sheetsService = sheetsService;
+        this.patientsService = patientsService;
         this.logger = new common_1.Logger(AppointmentsService_1.name);
+    }
+    async findByPatient(patientId) {
+        return this.appointmentModel
+            .find({ patientId: new mongoose_2.Types.ObjectId(patientId) })
+            .populate('serviceId', 'name slug icon durationMinutes')
+            .populate('specialistId', 'name slug photo specialty')
+            .sort({ date: -1, time: -1 })
+            .exec();
     }
     async findAll(filters = {}) {
         const query = {};
@@ -99,11 +109,18 @@ let AppointmentsService = AppointmentsService_1 = class AppointmentsService {
             time: dto.time,
             status: 'cancelada',
         });
+        const { patient } = await this.patientsService.resolveOrCreateForAppointment({
+            documentNumber: dto.patientDocument,
+            name: dto.patientName,
+            email: dto.patientEmail,
+            phone: dto.patientPhone,
+        });
         let created;
         try {
             created = await this.appointmentModel.create({
                 ...dto,
                 date: appointmentDate,
+                patientId: patient?._id,
             });
         }
         catch (error) {
@@ -202,9 +219,11 @@ exports.AppointmentsService = AppointmentsService;
 exports.AppointmentsService = AppointmentsService = AppointmentsService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(appointment_schema_1.Appointment.name)),
+    __param(4, (0, common_1.Inject)((0, common_1.forwardRef)(() => patients_service_1.PatientsService))),
     __metadata("design:paramtypes", [mongoose_2.Model,
         email_service_1.EmailService,
         google_calendar_service_1.GoogleCalendarService,
-        google_sheets_service_1.GoogleSheetsService])
+        google_sheets_service_1.GoogleSheetsService,
+        patients_service_1.PatientsService])
 ], AppointmentsService);
 //# sourceMappingURL=appointments.service.js.map

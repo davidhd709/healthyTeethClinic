@@ -6,6 +6,9 @@ export type AppointmentDocument = HydratedDocument<Appointment>;
 
 @Schema({ timestamps: true })
 export class Appointment {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Patient', index: true })
+  patientId?: mongoose.Types.ObjectId;
+
   @Prop({ required: true })
   patientName: string;
 

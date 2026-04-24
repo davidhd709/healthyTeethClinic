@@ -2,6 +2,7 @@ import { HydratedDocument } from 'mongoose';
 import * as mongoose from 'mongoose';
 export type AppointmentDocument = HydratedDocument<Appointment>;
 export declare class Appointment {
+    patientId?: mongoose.Types.ObjectId;
     patientName: string;
     patientEmail: string;
     patientPhone: string;
@@ -24,6 +25,15 @@ export declare const AppointmentSchema: mongoose.Schema<Appointment, mongoose.Mo
 }, "id"> & {
     id: string;
 }, {
+    patientId?: mongoose.SchemaDefinitionProperty<mongoose.Types.ObjectId | undefined, Appointment, mongoose.Document<unknown, {}, Appointment, {
+        id: string;
+    }, mongoose.DefaultSchemaOptions> & Omit<Appointment & {
+        _id: mongoose.Types.ObjectId;
+    } & {
+        __v: number;
+    }, "id"> & {
+        id: string;
+    }> | undefined;
     patientName?: mongoose.SchemaDefinitionProperty<string, Appointment, mongoose.Document<unknown, {}, Appointment, {
         id: string;
     }, mongoose.DefaultSchemaOptions> & Omit<Appointment & {

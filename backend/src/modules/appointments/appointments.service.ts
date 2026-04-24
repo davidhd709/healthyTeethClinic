@@ -1,12 +1,14 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   ConflictException,
   BadRequestException,
   Logger,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Appointment, AppointmentDocument } from './schemas/appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -14,6 +16,7 @@ import { endOfDay, parseDateOnly } from '../../common/utils/date.util';
 import { EmailService } from '../integrations/email.service';
 import { GoogleCalendarService } from '../integrations/google-calendar.service';
 import { GoogleSheetsService } from '../integrations/google-sheets.service';
+import { PatientsService } from '../patients/patients.service';
 
 export interface AppointmentFilters {
   status?: string;
@@ -33,7 +36,18 @@ export class AppointmentsService {
     private readonly emailService: EmailService,
     private readonly calendarService: GoogleCalendarService,
     private readonly sheetsService: GoogleSheetsService,
+    @Inject(forwardRef(() => PatientsService))
+    private readonly patientsService: PatientsService,
   ) {}
+
+  async findByPatient(patientId: string) {
+    return this.appointmentModel
+      .find({ patientId: new Types.ObjectId(patientId) })
+      .populate('serviceId', 'name slug icon durationMinutes')
+      .populate('specialistId', 'name slug photo specialty')
+      .sort({ date: -1, time: -1 })
+      .exec();
+  }
 
   async findAll(filters: AppointmentFilters = {}) {
     const query: Record<string, unknown> = {};
@@ -120,11 +134,19 @@ export class AppointmentsService {
       status: 'cancelada',
     });
 
+    const { patient } = await this.patientsService.resolveOrCreateForAppointment({
+      documentNumber: dto.patientDocument,
+      name: dto.patientName,
+      email: dto.patientEmail,
+      phone: dto.patientPhone,
+    });
+
     let created: AppointmentDocument;
     try {
       created = await this.appointmentModel.create({
         ...dto,
         date: appointmentDate,
+        patientId: patient?._id,
       });
     } catch (error) {
       if (

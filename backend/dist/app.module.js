@@ -19,6 +19,7 @@ const availability_module_1 = require("./modules/availability/availability.modul
 const contact_module_1 = require("./modules/contact/contact.module");
 const seed_module_1 = require("./modules/seed/seed.module");
 const bot_module_1 = require("./modules/bot/bot.module");
+const patients_module_1 = require("./modules/patients/patients.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,6 +38,7 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             services_module_1.ServicesModule,
             specialists_module_1.SpecialistsModule,
+            patients_module_1.PatientsModule,
             appointments_module_1.AppointmentsModule,
             availability_module_1.AvailabilityModule,
             contact_module_1.ContactModule,
