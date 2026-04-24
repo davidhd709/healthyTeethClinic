@@ -63,6 +63,37 @@ export interface IPaginatedPatients {
   totalPages: number;
 }
 
+export interface IClinicalEvolution {
+  _id: string;
+  date: string;
+  specialistId?: string | { _id: string; name: string; slug: string; specialty: string };
+  description: string;
+  diagnosis?: string;
+  treatment?: string;
+  recommendations?: string;
+  nextAppointmentSuggestion?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IMedicalHistory {
+  _id: string;
+  patientId: string;
+  chiefComplaint?: string;
+  initialDiagnosis?: string;
+  treatmentPlan?: string;
+  generalObservations?: string;
+  evolutions: IClinicalEvolution[];
+  isActive: boolean;
+  deletedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IService {
   _id: string;
   name: string;

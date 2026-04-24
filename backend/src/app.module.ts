@@ -11,6 +11,7 @@ import { ContactModule } from './modules/contact/contact.module';
 import { SeedModule } from './modules/seed/seed.module';
 import { BotModule } from './modules/bot/bot.module';
 import { PatientsModule } from './modules/patients/patients.module';
+import { MedicalHistoriesModule } from './modules/medical-histories/medical-histories.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { PatientsModule } from './modules/patients/patients.module';
     ServicesModule,
     SpecialistsModule,
     PatientsModule,
+    MedicalHistoriesModule,
     AppointmentsModule,
     AvailabilityModule,
     ContactModule,

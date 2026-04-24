@@ -20,6 +20,7 @@ const contact_module_1 = require("./modules/contact/contact.module");
 const seed_module_1 = require("./modules/seed/seed.module");
 const bot_module_1 = require("./modules/bot/bot.module");
 const patients_module_1 = require("./modules/patients/patients.module");
+const medical_histories_module_1 = require("./modules/medical-histories/medical-histories.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -39,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
             services_module_1.ServicesModule,
             specialists_module_1.SpecialistsModule,
             patients_module_1.PatientsModule,
+            medical_histories_module_1.MedicalHistoriesModule,
             appointments_module_1.AppointmentsModule,
             availability_module_1.AvailabilityModule,
             contact_module_1.ContactModule,

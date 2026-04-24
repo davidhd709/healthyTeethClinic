@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const patient_schema_1 = require("./schemas/patient.schema");
+const medical_histories_service_1 = require("../medical-histories/medical-histories.service");
 function splitName(fullName) {
     const parts = fullName.trim().split(/\s+/);
     if (parts.length === 1)
@@ -40,8 +41,9 @@ function parseBirthDate(value) {
     return parsed;
 }
 let PatientsService = class PatientsService {
-    constructor(patientModel) {
+    constructor(patientModel, medicalHistoriesService) {
         this.patientModel = patientModel;
+        this.medicalHistoriesService = medicalHistoriesService;
     }
     async findAll(query) {
         const filter = {};
@@ -109,6 +111,7 @@ let PatientsService = class PatientsService {
             createdBy: createdBy ? new mongoose_2.Types.ObjectId(createdBy) : undefined,
             updatedBy: createdBy ? new mongoose_2.Types.ObjectId(createdBy) : undefined,
         });
+        await this.medicalHistoriesService.ensureForPatient(String(created._id), createdBy);
         return created;
     }
     async update(id, dto, updatedBy) {
@@ -223,6 +226,7 @@ exports.PatientsService = PatientsService;
 exports.PatientsService = PatientsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(patient_schema_1.Patient.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        medical_histories_service_1.MedicalHistoriesService])
 ], PatientsService);
 //# sourceMappingURL=patients.service.js.map

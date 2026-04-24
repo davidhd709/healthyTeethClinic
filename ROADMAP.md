@@ -4,7 +4,7 @@
 > Objetivo: convertir la app actual (agenda + dashboard + servicios + especialistas) en un sistema odontológico profesional completo.
 
 **Última actualización:** 2026-04-24
-**Estado global:** Fases 0, 1 y 2 completadas — Listo para iniciar Fase 3 (Historia clínica)
+**Estado global:** Fases 0, 1, 2 y 3 completadas — Listo para iniciar Fase 4 (Odontograma)
 
 ---
 
@@ -228,41 +228,49 @@ Objetivo: CRUD completo de pacientes con perfil por pestañas.
 
 ### Fase 3 — Historia clínica y evoluciones
 
-**Estado:** Pendiente
-**Inicio:** —
-**Fin:** —
+**Estado:** Completada
+**Inicio:** 2026-04-24
+**Fin:** 2026-04-24
 **Depende de:** Fase 2
 
 Objetivo: ficha médica por paciente con evoluciones cronológicas.
 
+**Decisión de alcance clínico:** los antecedentes estáticos (alergias, enfermedades, medicamentos, antecedentes médicos/odontológicos) viven en `Patient.medicalInfo` (Fase 2). La historia clínica se enfoca en motivo de consulta, diagnóstico inicial, plan de tratamiento, observaciones y evoluciones cronológicas. Evita duplicación de datos.
+
 #### Backend — archivos nuevos
-- [ ] `backend/src/modules/medical-histories/medical-histories.module.ts`
-- [ ] `backend/src/modules/medical-histories/medical-histories.controller.ts`
-- [ ] `backend/src/modules/medical-histories/medical-histories.service.ts`
-- [ ] `backend/src/modules/medical-histories/schemas/medical-history.schema.ts`
-- [ ] `backend/src/modules/medical-histories/schemas/clinical-evolution.schema.ts`
-- [ ] `backend/src/modules/medical-histories/dto/update-medical-history.dto.ts`
-- [ ] `backend/src/modules/medical-histories/dto/create-evolution.dto.ts`
+- [x] `backend/src/modules/medical-histories/medical-histories.module.ts`
+- [x] `backend/src/modules/medical-histories/medical-histories.controller.ts`
+- [x] `backend/src/modules/medical-histories/medical-histories.service.ts`
+- [x] `backend/src/modules/medical-histories/schemas/medical-history.schema.ts`
+- [x] `backend/src/modules/medical-histories/schemas/clinical-evolution.schema.ts`
+- [x] `backend/src/modules/medical-histories/dto/update-medical-history.dto.ts`
+- [x] `backend/src/modules/medical-histories/dto/create-evolution.dto.ts`
+- [x] `backend/src/modules/medical-histories/dto/update-evolution.dto.ts`
 
 #### Backend — archivos modificados
-- [ ] `backend/src/app.module.ts`
-- [ ] `backend/src/modules/patients/patients.service.ts` — crea historia clínica vacía al crear paciente
+- [x] `backend/src/app.module.ts` — registra `MedicalHistoriesModule`
+- [x] `backend/src/modules/patients/patients.module.ts` — importa `MedicalHistoriesModule`
+- [x] `backend/src/modules/patients/patients.service.ts` — al crear paciente hace `ensureForPatient` (idempotente)
 
 #### Frontend — archivos nuevos
-- [ ] `frontend/src/components/medical-history/MedicalHistoryTabs.tsx`
-- [ ] `frontend/src/components/medical-history/MedicalHistoryForm.tsx`
-- [ ] `frontend/src/components/medical-history/ClinicalEvolutionForm.tsx`
-- [ ] `frontend/src/components/medical-history/EvolutionTimeline.tsx`
-- [ ] `frontend/src/lib/validations/medical-history.schema.ts`
+- [x] `frontend/src/components/medical-history/MedicalHistoryTabs.tsx` — orquestador (datos clínicos + evoluciones)
+- [x] `frontend/src/components/medical-history/MedicalHistoryForm.tsx`
+- [x] `frontend/src/components/medical-history/ClinicalEvolutionForm.tsx`
+- [x] `frontend/src/components/medical-history/EvolutionTimeline.tsx`
+- [x] `frontend/src/lib/validations/medical-history.schema.ts`
 
 #### Frontend — archivos modificados
-- [ ] `frontend/src/components/patients/PatientProfileTabs.tsx` — integra historia clínica
+- [x] `frontend/src/components/patients/PatientProfileTabs.tsx` — integra historia clínica en la pestaña
+- [x] `frontend/src/types/index.ts` — añade `IMedicalHistory`, `IClinicalEvolution`
 
 #### Criterios de aceptación
-- [ ] Cada paciente tiene automáticamente una historia clínica.
-- [ ] Se pueden agregar múltiples evoluciones con fecha y especialista.
-- [ ] La historia clínica no se elimina físicamente.
-- [ ] Solo admin y specialist pueden editarla; recepcionista solo lectura.
+- [x] Cada paciente nuevo recibe automáticamente una historia clínica (`ensureForPatient`).
+- [x] `GET` crea perezosamente la historia si el paciente es legacy.
+- [x] Se pueden agregar múltiples evoluciones con fecha y especialista.
+- [x] Las evoluciones se pueden **editar** pero no eliminar (append-only en la UX).
+- [x] La historia clínica nunca se elimina físicamente (`isActive` + `deletedAt`).
+- [x] Permisos: admin y specialist editan; receptionist solo lectura (form deshabilitado, no aparece botón "Nueva evolución").
+- [x] Audit trail: `createdBy`/`updatedBy` en historia y por evolución.
 
 ---
 
@@ -557,6 +565,16 @@ Objetivo: subida de radiografías, fotos y documentos a Cloudinary.
   - Pestañas "Historia clínica", "Odontograma", "Procedimientos" y "Archivos" muestran placeholders claros con referencia a su fase.
   - Búsqueda con debounce + paginación server-side.
   - Permisos: admin y recepcionista gestionan; especialista solo ve.
+  - Backend build OK. Frontend lint + type-check OK.
+- **Fase 3 completada:**
+  - Módulo `medical-histories`: schema 1:1 con paciente, subdocumento `ClinicalEvolution` append-friendly, borrado lógico, audit.
+  - Endpoints anidados bajo `/api/patients/:patientId/medical-history` (GET/PATCH + evoluciones POST/PATCH).
+  - `PatientsService.create` hace `ensureForPatient` idempotente (nunca duplica historia).
+  - `getOrCreateByPatient` crea lazily para pacientes legacy sin romper nada.
+  - Frontend: `MedicalHistoryTabs` reemplaza el placeholder dentro del perfil del paciente.
+  - Dos pestañas internas: **Datos clínicos** (motivo, diagnóstico, plan, observaciones) y **Evoluciones** con timeline cronológica.
+  - `ClinicalEvolutionForm` permite crear y editar evoluciones (no hay borrado por ser registro médico).
+  - Permisos: admin + specialist editan; receptionist ve sin poder modificar (form deshabilitado, sin botón de agregar).
   - Backend build OK. Frontend lint + type-check OK.
 
 ---

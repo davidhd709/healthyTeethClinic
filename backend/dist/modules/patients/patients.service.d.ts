@@ -3,6 +3,7 @@ import { Patient, PatientDocument } from './schemas/patient.schema';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { QueryPatientDto } from './dto/query-patient.dto';
+import { MedicalHistoriesService } from '../medical-histories/medical-histories.service';
 export interface ResolvePatientInput {
     documentNumber?: string;
     name: string;
@@ -11,7 +12,8 @@ export interface ResolvePatientInput {
 }
 export declare class PatientsService {
     private readonly patientModel;
-    constructor(patientModel: Model<PatientDocument>);
+    private readonly medicalHistoriesService;
+    constructor(patientModel: Model<PatientDocument>, medicalHistoriesService: MedicalHistoriesService);
     findAll(query: QueryPatientDto): Promise<{
         items: (import("mongoose").Document<unknown, {}, import("mongoose").Document<unknown, {}, Patient, {}, import("mongoose").DefaultSchemaOptions> & Patient & {
             _id: Types.ObjectId;

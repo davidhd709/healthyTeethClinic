@@ -27,6 +27,7 @@ import {
 import { apiUrl, authHeaders } from '@/lib/api';
 import type { IAppointment, IPatient, IService, ISpecialist } from '@/types';
 import { calculateAge, DOCUMENT_TYPE_LABELS, SEX_LABELS } from '@/lib/patient-utils';
+import MedicalHistoryTabs from '@/components/medical-history/MedicalHistoryTabs';
 
 interface PatientProfileTabsProps {
   patient: IPatient;
@@ -93,10 +94,7 @@ export default function PatientProfileTabs({ patient }: PatientProfileTabsProps)
       </TabsContent>
 
       <TabsContent value="medical" className="mt-6">
-        <ComingSoon
-          title="Historia clínica odontológica"
-          description="Se activa en la Fase 3. Aquí verás motivo de consulta, diagnóstico, plan de tratamiento y evoluciones clínicas."
-        />
+        <MedicalHistoryTabs patientId={patient._id} />
       </TabsContent>
 
       <TabsContent value="odontogram" className="mt-6">

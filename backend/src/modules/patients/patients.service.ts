@@ -10,6 +10,7 @@ import { Patient, PatientDocument } from './schemas/patient.schema';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { QueryPatientDto } from './dto/query-patient.dto';
+import { MedicalHistoriesService } from '../medical-histories/medical-histories.service';
 
 export interface ResolvePatientInput {
   documentNumber?: string;
@@ -47,6 +48,7 @@ export class PatientsService {
   constructor(
     @InjectModel(Patient.name)
     private readonly patientModel: Model<PatientDocument>,
+    private readonly medicalHistoriesService: MedicalHistoriesService,
   ) {}
 
   async findAll(query: QueryPatientDto) {
@@ -124,6 +126,7 @@ export class PatientsService {
       createdBy: createdBy ? new Types.ObjectId(createdBy) : undefined,
       updatedBy: createdBy ? new Types.ObjectId(createdBy) : undefined,
     });
+    await this.medicalHistoriesService.ensureForPatient(String(created._id), createdBy);
     return created;
   }
 

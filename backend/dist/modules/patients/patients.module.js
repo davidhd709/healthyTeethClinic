@@ -13,6 +13,7 @@ const patient_schema_1 = require("./schemas/patient.schema");
 const patients_service_1 = require("./patients.service");
 const patients_controller_1 = require("./patients.controller");
 const appointments_module_1 = require("../appointments/appointments.module");
+const medical_histories_module_1 = require("../medical-histories/medical-histories.module");
 let PatientsModule = class PatientsModule {
 };
 exports.PatientsModule = PatientsModule;
@@ -21,6 +22,7 @@ exports.PatientsModule = PatientsModule = __decorate([
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: patient_schema_1.Patient.name, schema: patient_schema_1.PatientSchema }]),
             (0, common_1.forwardRef)(() => appointments_module_1.AppointmentsModule),
+            medical_histories_module_1.MedicalHistoriesModule,
         ],
         controllers: [patients_controller_1.PatientsController],
         providers: [patients_service_1.PatientsService],
