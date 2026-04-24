@@ -1,11 +1,6 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import { ConfigService } from '@nestjs/config';
-
-interface AdminTokenPayload {
-  sub: string;
-  iat: number;
-  exp: number;
-}
+import { JwtPayload, UserRole, USER_ROLES } from '../types/jwt-payload.type';
 
 const DEFAULT_TOKEN_TTL_SECONDS = 8 * 60 * 60;
 
@@ -28,6 +23,10 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(aBuffer, bBuffer);
 }
 
+function isValidRole(value: unknown): value is UserRole {
+  return typeof value === 'string' && (USER_ROLES as readonly string[]).includes(value);
+}
+
 export function getAdminTokenSecret(configService: ConfigService): string {
   const configured = configService.get<string>('ADMIN_TOKEN_SECRET');
   if (configured && configured.trim().length > 0) {
@@ -48,21 +47,29 @@ export function getAdminTokenTtlSeconds(configService: ConfigService): number {
   return DEFAULT_TOKEN_TTL_SECONDS;
 }
 
+export interface GenerateTokenOptions {
+  email: string;
+  role: UserRole;
+  userId?: string;
+  secret: string;
+  ttlSeconds: number;
+}
+
 export function generateAdminToken(
-  email: string,
-  secret: string,
-  ttlSeconds: number,
+  options: GenerateTokenOptions,
 ): { token: string; expiresAt: string } {
   const now = Math.floor(Date.now() / 1000);
-  const exp = now + ttlSeconds;
-  const payload: AdminTokenPayload = {
-    sub: email,
+  const exp = now + options.ttlSeconds;
+  const payload: JwtPayload = {
+    sub: options.email,
+    role: options.role,
+    userId: options.userId,
     iat: now,
     exp,
   };
 
   const payloadBase64 = toBase64Url(JSON.stringify(payload));
-  const signature = sign(payloadBase64, secret);
+  const signature = sign(payloadBase64, options.secret);
 
   return {
     token: `${payloadBase64}.${signature}`,
@@ -70,33 +77,39 @@ export function generateAdminToken(
   };
 }
 
-export function verifyAdminToken(
-  token: string,
-  secret: string,
-): AdminTokenPayload | null {
+export function verifyAdminToken(token: string, secret: string): JwtPayload | null {
   const [payloadBase64, signature] = token.split('.');
   if (!payloadBase64 || !signature) return null;
 
   const expectedSignature = sign(payloadBase64, secret);
   if (!safeEqual(signature, expectedSignature)) return null;
 
-  let payload: AdminTokenPayload;
+  let raw: Record<string, unknown>;
   try {
-    payload = JSON.parse(fromBase64Url(payloadBase64)) as AdminTokenPayload;
+    raw = JSON.parse(fromBase64Url(payloadBase64)) as Record<string, unknown>;
   } catch {
     return null;
   }
 
   if (
-    typeof payload.sub !== 'string' ||
-    typeof payload.iat !== 'number' ||
-    typeof payload.exp !== 'number'
+    typeof raw.sub !== 'string' ||
+    typeof raw.iat !== 'number' ||
+    typeof raw.exp !== 'number'
   ) {
     return null;
   }
 
   const now = Math.floor(Date.now() / 1000);
-  if (payload.exp <= now) return null;
+  if (raw.exp <= now) return null;
 
-  return payload;
+  const role: UserRole = isValidRole(raw.role) ? raw.role : 'admin';
+  const userId = typeof raw.userId === 'string' ? raw.userId : undefined;
+
+  return {
+    sub: raw.sub,
+    role,
+    userId,
+    iat: raw.iat,
+    exp: raw.exp,
+  };
 }

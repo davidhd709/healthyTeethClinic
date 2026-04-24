@@ -9,13 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminGuard = void 0;
+exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const core_1 = require("@nestjs/core");
+const roles_decorator_1 = require("../decorators/roles.decorator");
 const admin_token_util_1 = require("../utils/admin-token.util");
-let AdminGuard = class AdminGuard {
-    constructor(configService) {
+let RolesGuard = class RolesGuard {
+    constructor(configService, reflector) {
         this.configService = configService;
+        this.reflector = reflector;
     }
     canActivate(context) {
         const request = context
@@ -31,23 +34,28 @@ let AdminGuard = class AdminGuard {
         if (!payload) {
             throw new common_1.UnauthorizedException('Token inválido o expirado');
         }
-        const adminEmail = this.configService.get('ADMIN_EMAIL');
-        const isEnvAdmin = payload.sub === adminEmail;
-        const isAdminRole = payload.role === 'admin';
-        if (!isEnvAdmin && !isAdminRole) {
-            throw new common_1.UnauthorizedException('Credenciales de administrador inválidas');
-        }
         request.user = {
             email: payload.sub,
             role: payload.role,
             userId: payload.userId,
         };
+        const requiredRoles = this.reflector.getAllAndOverride(roles_decorator_1.ROLES_KEY, [context.getHandler(), context.getClass()]);
+        if (!requiredRoles || requiredRoles.length === 0) {
+            return true;
+        }
+        if (payload.role === 'admin') {
+            return true;
+        }
+        if (!requiredRoles.includes(payload.role)) {
+            throw new common_1.ForbiddenException('No tienes permisos para realizar esta acción');
+        }
         return true;
     }
 };
-exports.AdminGuard = AdminGuard;
-exports.AdminGuard = AdminGuard = __decorate([
+exports.RolesGuard = RolesGuard;
+exports.RolesGuard = RolesGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
-], AdminGuard);
-//# sourceMappingURL=admin.guard.js.map
+    __metadata("design:paramtypes", [config_1.ConfigService,
+        core_1.Reflector])
+], RolesGuard);
+//# sourceMappingURL=roles.guard.js.map

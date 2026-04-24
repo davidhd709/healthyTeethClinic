@@ -6,6 +6,7 @@ import {
   getAdminTokenSecret,
   getAdminTokenTtlSeconds,
 } from '../../common/utils/admin-token.util';
+import { UserRole } from '../../common/types/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -19,13 +20,20 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    const role: UserRole = 'admin';
     const secret = getAdminTokenSecret(this.configService);
     const ttlSeconds = getAdminTokenTtlSeconds(this.configService);
-    const { token, expiresAt } = generateAdminToken(dto.email, secret, ttlSeconds);
+    const { token, expiresAt } = generateAdminToken({
+      email: dto.email,
+      role,
+      secret,
+      ttlSeconds,
+    });
 
     return {
       token,
       email: dto.email,
+      role,
       expiresAt,
     };
   }

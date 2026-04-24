@@ -6,6 +6,7 @@ export declare class AuthService {
     login(dto: LoginDto): Promise<{
         token: string;
         email: string;
+        role: "admin";
         expiresAt: string;
     }>;
 }

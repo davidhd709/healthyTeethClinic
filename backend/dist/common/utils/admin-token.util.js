@@ -5,6 +5,7 @@ exports.getAdminTokenTtlSeconds = getAdminTokenTtlSeconds;
 exports.generateAdminToken = generateAdminToken;
 exports.verifyAdminToken = verifyAdminToken;
 const crypto_1 = require("crypto");
+const jwt_payload_type_1 = require("../types/jwt-payload.type");
 const DEFAULT_TOKEN_TTL_SECONDS = 8 * 60 * 60;
 function toBase64Url(value) {
     return Buffer.from(value, 'utf-8').toString('base64url');
@@ -21,6 +22,9 @@ function safeEqual(a, b) {
     if (aBuffer.length !== bBuffer.length)
         return false;
     return (0, crypto_1.timingSafeEqual)(aBuffer, bBuffer);
+}
+function isValidRole(value) {
+    return typeof value === 'string' && jwt_payload_type_1.USER_ROLES.includes(value);
 }
 function getAdminTokenSecret(configService) {
     const configured = configService.get('ADMIN_TOKEN_SECRET');
@@ -39,16 +43,18 @@ function getAdminTokenTtlSeconds(configService) {
     }
     return DEFAULT_TOKEN_TTL_SECONDS;
 }
-function generateAdminToken(email, secret, ttlSeconds) {
+function generateAdminToken(options) {
     const now = Math.floor(Date.now() / 1000);
-    const exp = now + ttlSeconds;
+    const exp = now + options.ttlSeconds;
     const payload = {
-        sub: email,
+        sub: options.email,
+        role: options.role,
+        userId: options.userId,
         iat: now,
         exp,
     };
     const payloadBase64 = toBase64Url(JSON.stringify(payload));
-    const signature = sign(payloadBase64, secret);
+    const signature = sign(payloadBase64, options.secret);
     return {
         token: `${payloadBase64}.${signature}`,
         expiresAt: new Date(exp * 1000).toISOString(),
@@ -61,21 +67,29 @@ function verifyAdminToken(token, secret) {
     const expectedSignature = sign(payloadBase64, secret);
     if (!safeEqual(signature, expectedSignature))
         return null;
-    let payload;
+    let raw;
     try {
-        payload = JSON.parse(fromBase64Url(payloadBase64));
+        raw = JSON.parse(fromBase64Url(payloadBase64));
     }
     catch {
         return null;
     }
-    if (typeof payload.sub !== 'string' ||
-        typeof payload.iat !== 'number' ||
-        typeof payload.exp !== 'number') {
+    if (typeof raw.sub !== 'string' ||
+        typeof raw.iat !== 'number' ||
+        typeof raw.exp !== 'number') {
         return null;
     }
     const now = Math.floor(Date.now() / 1000);
-    if (payload.exp <= now)
+    if (raw.exp <= now)
         return null;
-    return payload;
+    const role = isValidRole(raw.role) ? raw.role : 'admin';
+    const userId = typeof raw.userId === 'string' ? raw.userId : undefined;
+    return {
+        sub: raw.sub,
+        role,
+        userId,
+        iat: raw.iat,
+        exp: raw.exp,
+    };
 }
 //# sourceMappingURL=admin-token.util.js.map

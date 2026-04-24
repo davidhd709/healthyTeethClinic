@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Stethoscope,
@@ -12,31 +12,46 @@ import {
   X,
   Sparkles,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { usePermissions } from '@/hooks/usePermissions';
+import type { Permission } from '@/lib/permissions';
 
-const navItems = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  permission: Permission;
+}
+
+const navItems: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/admin/dashboard',
     icon: LayoutDashboard,
+    permission: 'dashboard.view',
   },
   {
     label: 'Servicios',
     href: '/admin/servicios',
     icon: Stethoscope,
+    permission: 'services.manage',
   },
   {
     label: 'Especialistas',
     href: '/admin/especialistas',
     icon: Users,
+    permission: 'specialists.manage',
   },
   {
     label: 'Citas',
     href: '/admin/citas',
     icon: CalendarCheck,
+    permission: 'appointments.view',
   },
 ];
 
@@ -47,16 +62,13 @@ interface AdminSidebarProps {
 
 export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const { logout } = useAuth();
+  const { can, ready } = usePermissions();
 
-  function handleLogout() {
-    localStorage.removeItem('admin_token');
-    router.push('/admin/login');
-  }
+  const visibleItems = ready ? navItems.filter((item) => can(item.permission)) : navItems;
 
   return (
     <>
-      {/* Mobile overlay */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
@@ -64,14 +76,12 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-slate-900 text-white transition-transform duration-300 lg:static lg:translate-x-0',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {/* Header */}
         <div className="flex h-16 items-center justify-between px-4">
           <Link href="/admin/dashboard" className="flex items-center gap-2">
             <Sparkles className="h-7 w-7 text-cyan-400" />
@@ -96,10 +106,9 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
 
         <Separator className="bg-slate-700" />
 
-        {/* Navigation */}
         <ScrollArea className="flex-1 px-3 py-4">
           <nav className="flex flex-col gap-1">
-            {navItems.map((item) => {
+            {visibleItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               return (
                 <Link
@@ -121,7 +130,6 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
           </nav>
         </ScrollArea>
 
-        {/* Footer actions */}
         <div className="border-t border-slate-700 p-3">
           <Link
             href="/"
@@ -132,7 +140,7 @@ export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             Ver Sitio Web
           </Link>
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
           >
             <LogOut className="h-5 w-5 shrink-0" />

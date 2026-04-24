@@ -23,12 +23,19 @@ let AuthService = class AuthService {
         if (dto.email !== adminEmail || dto.password !== adminPassword) {
             throw new common_1.UnauthorizedException('Credenciales inválidas');
         }
+        const role = 'admin';
         const secret = (0, admin_token_util_1.getAdminTokenSecret)(this.configService);
         const ttlSeconds = (0, admin_token_util_1.getAdminTokenTtlSeconds)(this.configService);
-        const { token, expiresAt } = (0, admin_token_util_1.generateAdminToken)(dto.email, secret, ttlSeconds);
+        const { token, expiresAt } = (0, admin_token_util_1.generateAdminToken)({
+            email: dto.email,
+            role,
+            secret,
+            ttlSeconds,
+        });
         return {
             token,
             email: dto.email,
+            role,
             expiresAt,
         };
     }
