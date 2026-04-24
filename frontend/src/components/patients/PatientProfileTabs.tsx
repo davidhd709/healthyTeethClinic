@@ -28,6 +28,7 @@ import { apiUrl, authHeaders } from '@/lib/api';
 import type { IAppointment, IPatient, IService, ISpecialist } from '@/types';
 import { calculateAge, DOCUMENT_TYPE_LABELS, SEX_LABELS } from '@/lib/patient-utils';
 import MedicalHistoryTabs from '@/components/medical-history/MedicalHistoryTabs';
+import OdontogramView from '@/components/odontogram/OdontogramView';
 
 interface PatientProfileTabsProps {
   patient: IPatient;
@@ -98,10 +99,7 @@ export default function PatientProfileTabs({ patient }: PatientProfileTabsProps)
       </TabsContent>
 
       <TabsContent value="odontogram" className="mt-6">
-        <ComingSoon
-          title="Odontograma clínico interactivo"
-          description="Se activa en la Fase 4. Aquí podrás marcar tratamientos por diente y superficie (oclusal, mesial, distal, vestibular, lingual/palatina)."
-        />
+        <OdontogramView patientId={patient._id} />
       </TabsContent>
 
       <TabsContent value="procedures" className="mt-6">

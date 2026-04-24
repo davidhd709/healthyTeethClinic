@@ -21,6 +21,7 @@ const seed_module_1 = require("./modules/seed/seed.module");
 const bot_module_1 = require("./modules/bot/bot.module");
 const patients_module_1 = require("./modules/patients/patients.module");
 const medical_histories_module_1 = require("./modules/medical-histories/medical-histories.module");
+const odontograms_module_1 = require("./modules/odontograms/odontograms.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -41,6 +42,7 @@ exports.AppModule = AppModule = __decorate([
             specialists_module_1.SpecialistsModule,
             patients_module_1.PatientsModule,
             medical_histories_module_1.MedicalHistoriesModule,
+            odontograms_module_1.OdontogramsModule,
             appointments_module_1.AppointmentsModule,
             availability_module_1.AvailabilityModule,
             contact_module_1.ContactModule,

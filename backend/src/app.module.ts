@@ -12,6 +12,7 @@ import { SeedModule } from './modules/seed/seed.module';
 import { BotModule } from './modules/bot/bot.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { MedicalHistoriesModule } from './modules/medical-histories/medical-histories.module';
+import { OdontogramsModule } from './modules/odontograms/odontograms.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MedicalHistoriesModule } from './modules/medical-histories/medical-hist
     SpecialistsModule,
     PatientsModule,
     MedicalHistoriesModule,
+    OdontogramsModule,
     AppointmentsModule,
     AvailabilityModule,
     ContactModule,

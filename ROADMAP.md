@@ -4,7 +4,7 @@
 > Objetivo: convertir la app actual (agenda + dashboard + servicios + especialistas) en un sistema odontológico profesional completo.
 
 **Última actualización:** 2026-04-24
-**Estado global:** Fases 0, 1, 2 y 3 completadas — Listo para iniciar Fase 4 (Odontograma)
+**Estado global:** Fases 0-4 completadas — Listo para iniciar Fase 5 (Procedimientos)
 
 ---
 
@@ -276,52 +276,58 @@ Objetivo: ficha médica por paciente con evoluciones cronológicas.
 
 ### Fase 4 — Odontograma clínico interactivo (fase central)
 
-**Estado:** Pendiente
-**Inicio:** —
-**Fin:** —
+**Estado:** Completada
+**Inicio:** 2026-04-24
+**Fin:** 2026-04-24
 **Depende de:** Fase 2
 
 Objetivo: odontograma FDI interactivo, por diente y superficie, persistente.
 
 #### Backend — archivos nuevos
-- [ ] `backend/src/modules/odontograms/odontograms.module.ts`
-- [ ] `backend/src/modules/odontograms/odontograms.controller.ts`
-- [ ] `backend/src/modules/odontograms/odontograms.service.ts`
-- [ ] `backend/src/modules/odontograms/schemas/odontogram.schema.ts`
-- [ ] `backend/src/modules/odontograms/schemas/tooth-record.schema.ts`
-- [ ] `backend/src/modules/odontograms/schemas/tooth-surface-record.schema.ts`
-- [ ] `backend/src/modules/odontograms/schemas/odontogram-history.schema.ts`
-- [ ] `backend/src/modules/odontograms/dto/update-tooth.dto.ts`
-- [ ] `backend/src/modules/odontograms/dto/update-surface.dto.ts`
-- [ ] `backend/src/modules/odontograms/constants/fdi-teeth.constant.ts`
-- [ ] `backend/src/modules/odontograms/constants/tooth-status.constant.ts`
+- [x] `backend/src/modules/odontograms/odontograms.module.ts`
+- [x] `backend/src/modules/odontograms/odontograms.controller.ts`
+- [x] `backend/src/modules/odontograms/odontograms.service.ts`
+- [x] `backend/src/modules/odontograms/schemas/odontogram.schema.ts`
+- [x] `backend/src/modules/odontograms/schemas/tooth-record.schema.ts`
+- [x] `backend/src/modules/odontograms/schemas/tooth-surface-record.schema.ts`
+- [x] `backend/src/modules/odontograms/schemas/odontogram-history.schema.ts`
+- [x] `backend/src/modules/odontograms/dto/update-tooth.dto.ts`
+- [x] `backend/src/modules/odontograms/dto/update-surface.dto.ts`
+- [x] `backend/src/modules/odontograms/constants/fdi-teeth.constant.ts`
+- [x] `backend/src/modules/odontograms/constants/tooth-status.constant.ts`
 
 #### Backend — archivos modificados
-- [ ] `backend/src/app.module.ts`
+- [x] `backend/src/app.module.ts` — registra `OdontogramsModule`
 
 #### Frontend — archivos nuevos
-- [ ] `frontend/src/components/odontogram/OdontogramView.tsx`
-- [ ] `frontend/src/components/odontogram/DentalArch.tsx`
-- [ ] `frontend/src/components/odontogram/ToothItem.tsx`
-- [ ] `frontend/src/components/odontogram/ToothSurfaceSelector.tsx`
-- [ ] `frontend/src/components/odontogram/ToothDetailPanel.tsx`
-- [ ] `frontend/src/components/odontogram/ToothTreatmentForm.tsx`
-- [ ] `frontend/src/components/odontogram/OdontogramLegend.tsx`
-- [ ] `frontend/src/components/odontogram/ToothHistoryTable.tsx`
-- [ ] `frontend/src/lib/odontogram/fdi-teeth.ts`
-- [ ] `frontend/src/lib/odontogram/status-catalog.ts`
-- [ ] `frontend/src/lib/odontogram/surface-geometry.ts`
-- [ ] `frontend/src/lib/validations/odontogram.schema.ts`
-- [ ] `frontend/src/types/odontogram.ts`
+- [x] `frontend/src/components/odontogram/OdontogramView.tsx`
+- [x] `frontend/src/components/odontogram/DentalArch.tsx`
+- [x] `frontend/src/components/odontogram/ToothItem.tsx` — SVG 60×60 con 5 polígonos clickeables
+- [x] `frontend/src/components/odontogram/ToothDetailPanel.tsx` — Sheet con 3 tabs: superficies, estado del diente, historial
+- [x] `frontend/src/components/odontogram/ToothTreatmentForm.tsx`
+- [x] `frontend/src/components/odontogram/OdontogramLegend.tsx` — 27 estados agrupados por categoría
+- [x] `frontend/src/components/odontogram/ToothHistoryTable.tsx`
+- [x] `frontend/src/lib/odontogram/fdi-teeth.ts` — 32 dientes permanentes, labels, `occlusalLabel`
+- [x] `frontend/src/lib/odontogram/status-catalog.ts` — catálogo completo con colores hex, grupos
+- [x] `frontend/src/types/odontogram.ts`
+- [-] `frontend/src/components/odontogram/ToothSurfaceSelector.tsx` — integrado directamente en `ToothItem.tsx` (el SVG es el selector)
+- [-] `frontend/src/lib/odontogram/surface-geometry.ts` — integrado en `ToothItem.tsx` (geometría simple)
+- [-] `frontend/src/lib/validations/odontogram.schema.ts` — descartado: validación backend por class-validator es suficiente; los forms son controlados nativamente
+
+#### Frontend — archivos modificados
+- [x] `frontend/src/components/patients/PatientProfileTabs.tsx` — pestaña "Odontograma" monta `OdontogramView`
 
 #### Criterios de aceptación
-- [ ] Se muestran 32 dientes permanentes con numeración FDI correcta.
-- [ ] Cada diente es clickeable y abre panel lateral.
-- [ ] Cada diente permite marcar 5 superficies.
-- [ ] Al guardar un tratamiento, el diente cambia visualmente.
-- [ ] Cada cambio queda registrado en `odontogram_history` (append-only).
-- [ ] Solo admin y specialist pueden modificar; recepcionista solo lectura.
-- [ ] La leyenda muestra los 27 estados clínicos del brief.
+- [x] Se muestran 32 dientes permanentes con numeración FDI correcta (arcada superior + inferior, 16 por arcada).
+- [x] Cada diente es clickeable y abre un panel lateral (Sheet).
+- [x] Cada diente permite marcar 5 superficies con un click en el SVG.
+- [x] Al guardar un tratamiento, el diente cambia visualmente (color de superficie, outline del diente).
+- [x] Cada cambio de estado/superficie registra entrada en colección `odontogram_history` (append-only).
+- [x] Solo admin y specialist pueden modificar; receptionist ve todo pero el form está deshabilitado.
+- [x] Leyenda con los 27 estados clínicos del brief, agrupados por categoría.
+- [x] Lazy init: si el paciente no tiene odontograma, el primer GET crea los 32 dientes con estado `healthy`.
+- [x] Mesial/distal se invierten en los cuadrantes 2 y 3 para respetar la anatomía (línea media).
+- [x] `missing_tooth` muestra una cruz diagonal roja sobre el diente.
 
 ---
 
@@ -575,6 +581,21 @@ Objetivo: subida de radiografías, fotos y documentos a Cloudinary.
   - Dos pestañas internas: **Datos clínicos** (motivo, diagnóstico, plan, observaciones) y **Evoluciones** con timeline cronológica.
   - `ClinicalEvolutionForm` permite crear y editar evoluciones (no hay borrado por ser registro médico).
   - Permisos: admin + specialist editan; receptionist ve sin poder modificar (form deshabilitado, sin botón de agregar).
+  - Backend build OK. Frontend lint + type-check OK.
+- **Fase 4 completada (fase central):**
+  - Módulo `odontograms` con 3 schemas: `Odontogram` (1:1 con paciente), `ToothRecord` embebido (32 dientes inicializados con `healthy`), `ToothSurfaceRecord` por superficie, más colección separada `odontogram_history` append-only.
+  - Constantes compartidas: 32 dientes FDI (cuadrantes 1-4, upper/lower, tipos incisor/canine/premolar/molar) y 27 estados clínicos con metadatos.
+  - Endpoints: `GET /api/patients/:id/odontogram`, `PATCH /.../teeth/:num`, `PATCH /.../teeth/:num/surfaces/:surface`, `GET /.../history` (filtros por diente y superficie).
+  - Lazy init: primer GET crea los 32 dientes automáticamente.
+  - Cada cambio de condición emite entrada en `odontogram_history` (anterior → nuevo, con diagnóstico/procedimiento/notas/especialista).
+  - Frontend: odontograma SVG puro, cada diente es un SVG 60×60 con 5 polígonos clickeables (vestibular arriba, lingual/palatal abajo, mesial/distal a los lados, oclusal/incisal al centro).
+  - Mesial/distal se invierten por cuadrante para respetar la línea media anatómica.
+  - Click en superficie → abre panel lateral con form de esa superficie pre-seleccionada.
+  - Click en "Detalle" → abre panel con tab "Estado del diente" (toggleable con los 27 estados).
+  - Tab "Historial" muestra tabla cronológica del diente con estados anterior/nuevo.
+  - Leyenda agrupada por categoría (saludable, restauraciones, cirugía, prótesis, pendientes, periodontal).
+  - Permisos: admin + specialist editan; receptionist ve todo pero el form está deshabilitado.
+  - `missing_tooth` renderiza cruz diagonal roja sobre el SVG del diente.
   - Backend build OK. Frontend lint + type-check OK.
 
 ---
