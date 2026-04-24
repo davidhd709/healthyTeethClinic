@@ -1,3 +1,19 @@
+import type { UserRole } from '@/lib/jwt';
+
+export type { UserRole };
+
+export interface IUser {
+  _id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  specialistId?: string | { _id: string; name: string; slug: string; specialty: string };
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IService {
   _id: string;
   name: string;

@@ -11,6 +11,7 @@ import {
   ExternalLink,
   X,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,12 @@ const navItems: NavItem[] = [
     href: '/admin/citas',
     icon: CalendarCheck,
     permission: 'appointments.view',
+  },
+  {
+    label: 'Usuarios',
+    href: '/admin/usuarios',
+    icon: ShieldCheck,
+    permission: 'users.manage',
   },
 ];
 

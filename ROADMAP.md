@@ -4,7 +4,7 @@
 > Objetivo: convertir la app actual (agenda + dashboard + servicios + especialistas) en un sistema odontológico profesional completo.
 
 **Última actualización:** 2026-04-24
-**Estado global:** Fase 0 completada — Listo para iniciar Fase 1
+**Estado global:** Fases 0 y 1 completadas — Listo para iniciar Fase 2 (Pacientes)
 
 ---
 
@@ -120,45 +120,51 @@ Objetivo: base común (roles, guards, hooks de auth) que usan todas las fases.
 
 ### Fase 1 — Usuarios y roles
 
-**Estado:** Pendiente
-**Inicio:** —
-**Fin:** —
+**Estado:** Completada
+**Inicio:** 2026-04-24
+**Fin:** 2026-04-24
 **Depende de:** Fase 0
 **Bloquea a:** Fases 2, 3, 4, 5 (todo lo clínico necesita permisos)
 
 Objetivo: multi-usuario con roles `admin | specialist | receptionist`.
 
 #### Backend — archivos nuevos
-- [ ] `backend/src/modules/users/users.module.ts`
-- [ ] `backend/src/modules/users/users.controller.ts`
-- [ ] `backend/src/modules/users/users.service.ts`
-- [ ] `backend/src/modules/users/schemas/user.schema.ts`
-- [ ] `backend/src/modules/users/dto/create-user.dto.ts`
-- [ ] `backend/src/modules/users/dto/update-user.dto.ts`
-- [ ] `backend/src/modules/users/dto/query-user.dto.ts`
-- [ ] `backend/src/scripts/migrate-admin-user.ts` — crea admin `.env` en `users` si no existe (idempotente)
+- [x] `backend/src/modules/users/users.module.ts`
+- [x] `backend/src/modules/users/users.controller.ts`
+- [x] `backend/src/modules/users/users.service.ts`
+- [x] `backend/src/modules/users/schemas/user.schema.ts`
+- [x] `backend/src/modules/users/dto/create-user.dto.ts`
+- [x] `backend/src/modules/users/dto/update-user.dto.ts`
+- [x] `backend/src/modules/users/dto/query-user.dto.ts`
+- [x] `backend/src/scripts/migrate-admin-user.ts` — crea admin `.env` en `users` si no existe (idempotente)
+- [x] `backend/src/common/utils/password.util.ts` — hashing con scrypt nativo (sin dep nueva)
 
 #### Backend — archivos modificados
-- [ ] `backend/src/app.module.ts` — registra `UsersModule`
-- [ ] `backend/src/modules/auth/auth.service.ts` — login busca en `users`, fallback a admin `.env`
-- [ ] `backend/src/modules/auth/auth.controller.ts` — endpoint `GET /api/auth/me`
+- [x] `backend/src/app.module.ts` — registra `UsersModule`
+- [x] `backend/src/modules/auth/auth.module.ts` — importa `UsersModule`
+- [x] `backend/src/modules/auth/auth.service.ts` — login busca en `users`, fallback a admin `.env`
+- [x] `backend/src/modules/auth/auth.controller.ts` — endpoint `GET /api/auth/me` (ya hecho en Fase 0)
+- [x] `backend/package.json` — script `migrate:admin`
 
 #### Frontend — archivos nuevos
-- [ ] `frontend/src/app/admin/usuarios/page.tsx`
-- [ ] `frontend/src/app/admin/usuarios/nuevo/page.tsx`
-- [ ] `frontend/src/app/admin/usuarios/[id]/editar/page.tsx`
-- [ ] `frontend/src/components/admin/UserForm.tsx`
-- [ ] `frontend/src/components/admin/UserTable.tsx`
+- [x] `frontend/src/app/admin/usuarios/page.tsx` (una sola page con modal, consistente con el patrón actual de admin)
+- [x] `frontend/src/components/admin/UserForm.tsx`
+- [x] `frontend/src/components/admin/UserTable.tsx`
+- [-] `frontend/src/app/admin/usuarios/nuevo/page.tsx` — descartado (modal en page principal)
+- [-] `frontend/src/app/admin/usuarios/[id]/editar/page.tsx` — descartado (modal en page principal)
 
 #### Frontend — archivos modificados
-- [ ] `frontend/src/components/admin/AdminSidebar.tsx` — ítem "Usuarios" solo para admin
-- [ ] `frontend/src/types/index.ts` — interfaces `IUser`, `UserRole`
+- [x] `frontend/src/components/admin/AdminSidebar.tsx` — ítem "Usuarios" solo para admin (filtrado por `users.manage`)
+- [x] `frontend/src/types/index.ts` — interfaces `IUser`, re-export `UserRole`
+- [x] `frontend/src/hooks/useAuth.ts` — refactor a `useSyncExternalStore` (React 19 idiomatic)
 
 #### Criterios de aceptación
-- [ ] Admin puede crear/editar/inactivar usuarios.
-- [ ] Usuarios creados pueden iniciar sesión.
-- [ ] Admin `.env` sigue funcionando sin estar en BD.
-- [ ] Sidebar muestra ítems según rol.
+- [x] Admin puede crear/editar/inactivar usuarios.
+- [x] Usuarios creados pueden iniciar sesión (verificado vía compilación; pending test manual con MongoDB).
+- [x] Admin `.env` sigue funcionando sin estar en BD (fallback en `AuthService`).
+- [x] Sidebar muestra ítems según rol.
+- [x] Salvaguarda: no se puede desactivar/eliminar al último admin activo.
+- [x] `passwordHash` nunca sale al cliente (`select: false` + `toJSON` transform).
 
 ---
 
@@ -525,6 +531,15 @@ Objetivo: subida de radiografías, fotos y documentos a Cloudinary.
   - Frontend: `useAuth`, `usePermissions`, matriz de 16 permisos, decodificador JWT client-side.
   - Sidebar filtra ítems por permiso; logout centralizado en hook.
   - Backend build OK. Frontend type-check OK.
+- **Fase 1 completada:**
+  - Módulo `users` completo: schema con `passwordHash`, DTOs, service con CRUD + borrado lógico + salvaguarda de último admin.
+  - Hashing con `scrypt` nativo de Node (sin dependencia nueva).
+  - `AuthService` ahora consulta `users` primero, con fallback al admin `.env` (superusuario intacto).
+  - Script idempotente `npm run migrate:admin` para poblar el admin del `.env` en la colección `users`.
+  - Frontend: `UserForm`, `UserTable`, página `/admin/usuarios` con modal (consistente con `/admin/especialistas`).
+  - Sidebar: ítem "Usuarios" visible solo para admin.
+  - `useAuth` refactorizado a `useSyncExternalStore` para cumplir con las reglas de React 19.
+  - Backend build OK. Frontend lint + type-check OK (0 errores introducidos).
 
 ---
 

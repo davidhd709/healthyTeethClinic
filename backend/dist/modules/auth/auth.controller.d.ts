@@ -7,8 +7,17 @@ export declare class AuthController {
     login(dto: LoginDto): Promise<{
         token: string;
         email: string;
-        role: "admin";
+        role: import("../../common/types/jwt-payload.type").UserRole;
+        name: string;
+        userId: string;
         expiresAt: string;
+    } | {
+        token: string;
+        email: string;
+        role: "admin";
+        name: string;
+        expiresAt: string;
+        userId?: undefined;
     }>;
     me(user: AuthenticatedUser): AuthenticatedUser;
 }

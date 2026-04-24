@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { decodeToken, isTokenExpired, type DecodedToken, type UserRole } from '@/lib/jwt';
 
@@ -13,9 +13,30 @@ export interface AuthUser {
   userId?: string;
 }
 
-function readAuthUser(): AuthUser | null {
+function readToken(): string | null {
   if (typeof window === 'undefined') return null;
-  const token = window.localStorage.getItem(TOKEN_KEY);
+  return window.localStorage.getItem(TOKEN_KEY);
+}
+
+function subscribe(callback: () => void): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+  window.addEventListener('storage', callback);
+  window.addEventListener(TOKEN_CHANGED_EVENT, callback);
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener(TOKEN_CHANGED_EVENT, callback);
+  };
+}
+
+function getSnapshot(): string | null {
+  return readToken();
+}
+
+function getServerSnapshot(): string | null {
+  return null;
+}
+
+function tokenToUser(token: string | null): AuthUser | null {
   if (!token || isTokenExpired(token)) return null;
   const decoded: DecodedToken | null = decodeToken(token);
   if (!decoded) return null;
@@ -28,40 +49,22 @@ function readAuthUser(): AuthUser | null {
 
 export function useAuth() {
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    setUser(readAuthUser());
-    setReady(true);
-
-    function handleChange() {
-      setUser(readAuthUser());
-    }
-
-    window.addEventListener('storage', handleChange);
-    window.addEventListener(TOKEN_CHANGED_EVENT, handleChange);
-
-    return () => {
-      window.removeEventListener('storage', handleChange);
-      window.removeEventListener(TOKEN_CHANGED_EVENT, handleChange);
-    };
-  }, []);
+  const token = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const user = tokenToUser(token);
+  const ready = typeof window !== 'undefined';
 
   const logout = useCallback(() => {
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(TOKEN_KEY);
       window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
     }
-    setUser(null);
     router.push('/admin/login');
   }, [router]);
 
-  const setToken = useCallback((token: string) => {
+  const setToken = useCallback((value: string) => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(TOKEN_KEY, token);
+    window.localStorage.setItem(TOKEN_KEY, value);
     window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
-    setUser(readAuthUser());
   }, []);
 
   return {

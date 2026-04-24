@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./modules/auth/auth.module");
+const users_module_1 = require("./modules/users/users.module");
 const services_module_1 = require("./modules/services/services.module");
 const specialists_module_1 = require("./modules/specialists/specialists.module");
 const appointments_module_1 = require("./modules/appointments/appointments.module");
@@ -32,6 +33,7 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 inject: [config_1.ConfigService],
             }),
+            users_module_1.UsersModule,
             auth_module_1.AuthModule,
             services_module_1.ServicesModule,
             specialists_module_1.SpecialistsModule,
