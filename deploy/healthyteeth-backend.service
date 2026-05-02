@@ -1,0 +1,15 @@
+[Unit]
+Description=Healthy Teeth Clinic Backend
+After=network.target
+
+[Service]
+User=ingenierohenry
+Group=ingenierohenry
+WorkingDirectory=/home/ingenierohenry/healthyTeethClinic/backend
+EnvironmentFile=/home/ingenierohenry/healthyTeethClinic/backend/.env
+ExecStart=/usr/bin/npm run start:prod
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

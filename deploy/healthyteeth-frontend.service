@@ -1,0 +1,15 @@
+[Unit]
+Description=Healthy Teeth Clinic Frontend
+After=network.target
+
+[Service]
+User=ingenierohenry
+Group=ingenierohenry
+WorkingDirectory=/home/ingenierohenry/healthyTeethClinic/frontend
+EnvironmentFile=/home/ingenierohenry/healthyTeethClinic/frontend/.env.local
+ExecStart=/usr/bin/npm run start -- --hostname 127.0.0.1 --port 3001
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

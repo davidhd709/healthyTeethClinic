@@ -162,7 +162,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <p className="text-xs text-slate-500">
-            &copy; {currentYear} {CLINIC_NAME}. Todos los derechos reservados.
+            &copy; TacheTech {currentYear} {CLINIC_NAME}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-4">
             <Link
